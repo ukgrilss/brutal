@@ -193,7 +193,7 @@ export function ProductDetails({ product, isAdmin = false, user, hasAccess = fal
                                     <CheckoutButton
                                         product={product}
                                         selectedPrice={currentPrice}
-                                        selectedPlan={selectedPlan?.name}
+                                        selectedPlan={selectedPlan}
                                         user={user}
                                     />
 
@@ -408,7 +408,7 @@ export function ProductDetails({ product, isAdmin = false, user, hasAccess = fal
                                 <CheckoutButton
                                     product={product}
                                     selectedPrice={currentPrice}
-                                    selectedPlan={selectedPlan?.name}
+                                    selectedPlan={selectedPlan}
                                     user={user}
                                 />
                             </div>
