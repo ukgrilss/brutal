@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db'
 // import { generateSignedPlaybackUrl } from '@/lib/b2' // Deprecated
 import { getDownloadToken } from '@/lib/b2-native'
 import { cookies } from 'next/headers'
+import { generateValidCPF } from '@/lib/utils-cpf'
 
 import { getSession } from '@/lib/auth'
 
@@ -163,7 +164,7 @@ export async function createAnonymousCheckout(productId: string, planId: string 
             customer: {
                 name: customerName,
                 email: customerEmail, // Now sends real email if logged in
-                cpf: '48672061000', // Real CPF still needed eventually
+                cpf: generateValidCPF(), // Generate a valid CPF to pass gateway validation
                 phone: '11999999999'
             }
         })
