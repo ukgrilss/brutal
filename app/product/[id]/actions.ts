@@ -94,11 +94,24 @@ export async function createAnonymousCheckout(productId: string, planId: string 
 
         if (planId && product.plans) {
             const plan = product.plans.find(p => p.id === planId)
+
+            console.log('[Checkout Debug] Resolving Plan:', {
+                receivedPlanId: planId,
+                availablePlans: product.plans.map(p => ({ id: p.id, name: p.name, price: p.price }))
+            });
+
             if (plan) {
                 price = plan.price
                 productName = `${product.name} - ${plan.name}`
+                console.log('[Checkout Debug] Plan Found:', { name: plan.name, price: plan.price });
+            } else {
+                console.warn('[Checkout Debug] Plan ID provided but not found in product plans.');
             }
+        } else {
+            console.log('[Checkout Debug] No Plan ID provided or Product has no plans.', { planId, hasPlans: !!product.plans });
         }
+
+        console.log('[Checkout Debug] Final Price:', price);
 
         // Determine Customer Data
         let customerName = 'Cliente Anônimo'
