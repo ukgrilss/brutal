@@ -24,7 +24,13 @@ export async function createProduct(formData: FormData) {
     const plansJson = formData.get('plans') as string
     let plansData: { name: string, price: number }[] = []
     try {
-        if (plansJson) plansData = JSON.parse(plansJson)
+        if (plansJson) {
+            const parsed = JSON.parse(plansJson)
+            plansData = parsed.map((p: any) => ({
+                name: p.name,
+                price: Math.round((Number(p.price) || 0) * 100)
+            }))
+        }
     } catch (e) {
         console.error("Error parsing plans:", e)
     }
@@ -110,7 +116,13 @@ export async function updateProduct(id: string, formData: FormData) {
     const plansJson = formData.get('plans') as string
     let plansData: { name: string, price: number }[] = []
     try {
-        if (plansJson) plansData = JSON.parse(plansJson)
+        if (plansJson) {
+            const parsed = JSON.parse(plansJson)
+            plansData = parsed.map((p: any) => ({
+                name: p.name,
+                price: Math.round((Number(p.price) || 0) * 100)
+            }))
+        }
     } catch (e) {
         console.error("Error parsing plans:", e)
     }
