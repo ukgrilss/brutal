@@ -84,7 +84,7 @@ export const SyncPay = {
         const payload = {
             amount: data.amount,
             description: data.description || "Pagamento Loja",
-            customer: {
+            client: {
                 name: data.customer.name,
                 cpf: data.customer.cpf.replace(/\D/g, ''), // Remove non-digits
                 email: data.customer.email,
