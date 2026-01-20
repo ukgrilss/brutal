@@ -160,10 +160,10 @@ export function ProductDetails({ product, isAdmin = false, user, hasAccess = fal
                                         <p className="text-zinc-400 text-xs uppercase font-bold tracking-widest mb-1">Acesso Completo</p>
                                         <div className="flex items-end gap-2">
                                             <span className="text-3xl font-bold text-white">
-                                                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(currentPrice)}
+                                                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(currentPrice / 100)}
                                             </span>
                                             <span className="text-sm text-zinc-500 mb-1 line-through">
-                                                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(currentPrice * 1.5)}
+                                                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format((currentPrice * 1.5) / 100)}
                                             </span>
                                         </div>
                                     </div>
@@ -183,7 +183,7 @@ export function ProductDetails({ product, isAdmin = false, user, hasAccess = fal
                                                             }`}
                                                     >
                                                         <span className="font-bold">{plan.name}</span>
-                                                        <span>{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(plan.price)}</span>
+                                                        <span>{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(plan.price / 100)}</span>
                                                     </div>
                                                 ))}
                                             </div>
@@ -376,7 +376,7 @@ export function ProductDetails({ product, isAdmin = false, user, hasAccess = fal
                                                 </span>
                                             </div>
                                             <span className="font-bold text-white">
-                                                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(plan.price)}
+                                                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(plan.price / 100)}
                                             </span>
                                         </div>
                                     ))}
@@ -398,7 +398,7 @@ export function ProductDetails({ product, isAdmin = false, user, hasAccess = fal
                                     <span className="block text-zinc-500 text-sm uppercase tracking-widest font-bold mb-1">Preço Atual</span>
                                     <span className="block text-5xl font-black text-white tracking-tighter">
                                         <span className="text-green-500 text-6xl">
-                                            {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(currentPrice)}
+                                            {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(currentPrice / 100)}
                                         </span>
                                     </span>
                                 </div>
