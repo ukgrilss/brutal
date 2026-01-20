@@ -159,7 +159,7 @@ export async function createAnonymousCheckout(productId: string, planId: string 
 
         // 2. Create Charge
         const pixData = await SyncPay.createPixCharge(token, {
-            amount: price,
+            amount: price / 100, // Convert cents (200) to Reais (2.00)
             description: productName,
             customer: {
                 name: customerName,
