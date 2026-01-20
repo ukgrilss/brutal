@@ -1,0 +1,114 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model StoreConfig {
+  id            String  @id @default(cuid())
+  storeName     String  @default("Minha Loja de Grupos")
+  sincPayKey    String? // Chave da API SincPay
+  sincPaySecret String? // Segredo/Token se necessario
+  adminPassword String  @default("1234") // Senha simples inicial
+  heroMode      String  @default("full") // "full", "banner", "none", "text_only"
+  heroTitle     String? // Título/Headline personalizado
+  heroDescription String? // Subtítulo/Descrição abaixo do título
+  showHeroButton Boolean @default(true) // Mostrar ou esconder botão
+  heroButtonText String? // Texto do botão (Ex: Ver Produtos)
+  heroButtonUrl  String? // Link do botão (Ex: #produtos ou https://...)
+  updatedAt     DateTime @updatedAt
+}
+
+model Product {
+  id          String    @id @default(cuid())
+  name        String
+  description String
+  price       Float
+  type        String    @default("GROUP") // "GROUP" | "VIDEO"
+  groupLink   String?   // Agora opcional, pois type="VIDEO" não usa
+  contentUrl  String?   // ID do arquivo no Backblaze para vídeos
+  previewUrl  String?   // URL pública ou assinada do trailer/preview
+  views       Int       @default(0)
+  likes       Int       @default(0)
+  fakeViews   String?   @default("10k") // Visualizacoes manuais (Ex: "1.2M", "500 mil")
+  fakeDate    String?   @default("há 2 dias") // Data manual (Ex: "há 1 semana")
+  manualAuthor String?  @default("Loja Oficial") // Nome do canal/autor manual
+  previewDuration Int?  @default(0) // Duração do preview em segundos (0 = sem preview)
+  media       Media[]
+  active      Boolean   @default(true)
+  categoryId  String?
+  category    Category? @relation(fields: [categoryId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  plans       ProductPlan[]
+  orders      Order[]
+}
+
+model ProductPlan {
+  id        String   @id @default(cuid())
+  name      String
+  price     Float
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Category {
+  id        String    @id @default(cuid())
+  name      String
+  imageUrl  String?   // URL da imagem da categoria
+  order     Int       @default(0) // Ordem de exibição (menor = aparece primeiro)
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Banner {
+  id        String   @id @default(cuid())
+  title     String?
+  imageUrl  String
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Media {
+  id        String  @id @default(cuid())
+  type      String  // "IMAGE" | "VIDEO"
+  url       String  // Caminho local ou URL
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Order {
+  id              String   @id @default(cuid())
+  transactionId   String   @unique // ID da transação na SyncPay
+  status          String   @default("PENDING") // PENDING, PAID, FAILED
+  amount          Float
+  productName     String
+  customerName    String
+  customerEmail   String
+  customerDocument String
+  pixCode         String?  // Código Copia e Cola
+  pixQrCodeUrl    String?  // URL do QR Code (se houver)
+  productId       String?  // ID do produto comprado
+  product         Product? @relation(fields: [productId], references: [id])
+  userId          String?  // ID do usuário (opcional, para compras logadas)
+  user            User?    @relation(fields: [userId], references: [id])
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  orders    Order[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

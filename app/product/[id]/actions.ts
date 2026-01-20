@@ -1,0 +1,185 @@
+'use server'
+
+import { prisma } from '@/lib/db'
+// import { generateSignedPlaybackUrl } from '@/lib/b2' // Deprecated
+import { getDownloadToken } from '@/lib/b2-native'
+import { cookies } from 'next/headers'
+
+import { getSession } from '@/lib/auth'
+
+export async function startVideoSession(productId: string) {
+    const cookieStore = await cookies()
+    const isAdmin = cookieStore.get('admin_session')?.value === 'true'
+    const customerEmail = cookieStore.get('customer_email')?.value
+    const session = await getSession()
+
+    // Get Product to find B2 Key AND checks for preview logic
+    const product = await prisma.product.findUnique({ where: { id: productId } })
+
+    let hasAccess = false
+
+    if (!isAdmin) {
+
+        // 1. Check User Session
+        if (session && session.user) {
+            const order = await prisma.order.findFirst({
+                where: {
+                    productId: productId,
+                    userId: session.user.id,
+                    status: 'PAID'
+                }
+            })
+            if (order) hasAccess = true
+        }
+
+        // 2. Fallback to Legacy Cookie
+        if (!hasAccess && customerEmail) {
+            const order = await prisma.order.findFirst({
+                where: {
+                    productId: productId,
+                    customerEmail: customerEmail,
+                    status: 'PAID'
+                }
+            })
+            if (order) hasAccess = true
+        }
+
+        // 3. Check for Preview Mode
+        const isPreview = !hasAccess && (product?.previewDuration || 0) > 0
+
+        if (!hasAccess && !isPreview) {
+            // If logged in but no access
+            if (session) return { success: false, error: 'Você não possui este vídeo.' }
+            // If not logged in
+            return { success: false, error: 'Sessão expirada ou não iniciada.' }
+        }
+    }
+
+    if (!product || !product.contentUrl) {
+        return { success: false, error: 'Vídeo não encontrado.' }
+    }
+
+    try {
+        const { finalUrl } = await getDownloadToken(product.contentUrl)
+        console.log('Video Session Generated:', { productId, url: finalUrl })
+        return { success: true, url: finalUrl }
+    } catch (error: any) {
+        console.error('Video Session Error:', error)
+        return { success: false, error: `Erro B2: ${error.message}` }
+    }
+}
+
+export async function loginToWatch(productId: string, email: string) {
+    // ... existing logic can remain for legacy overrides ...
+    return { success: false, error: 'Use o sistema de login novo.' }
+}
+
+// --- Restored Checkout Actions ---
+
+import { SyncPay } from '@/lib/syncpay'
+
+export async function createAnonymousCheckout(productId: string, planId: string | null) {
+    try {
+        const session = await getSession()
+
+        const product = await prisma.product.findUnique({
+            where: { id: productId },
+            include: { plans: true }
+        })
+
+        if (!product) throw new Error('Produto não encontrado')
+
+        let price = product.price
+        let productName = product.name
+
+        if (planId && product.plans) {
+            const plan = product.plans.find(p => p.id === planId)
+            if (plan) {
+                price = plan.price
+                productName = `${product.name} - ${plan.name}`
+            }
+        }
+
+        // Determine Customer Data
+        let customerName = 'Cliente Anônimo'
+        let customerEmail = `anon_${Date.now()}@temp.com`
+        let customerId = undefined
+
+        if (session && session.user) {
+            customerName = session.user.name
+            customerEmail = session.user.email
+            customerId = session.user.id
+        }
+
+        // Create Order in DB (Pending)
+        const order = await prisma.order.create({
+            data: {
+                transactionId: `temp_${Date.now()}`,
+                amount: price,
+                productName: productName,
+                customerName: customerName,
+                customerEmail: customerEmail,
+                customerDocument: '00000000000', // Still placeholder unless we ask for CPF
+                status: 'PENDING',
+                productId: productId,
+                userId: customerId
+            }
+        })
+
+        // 1. Authenticate with SyncPay
+        const storeConfig = await prisma.storeConfig.findFirst()
+        const clientId = storeConfig?.sincPayKey || process.env.SINCPAY_CLIENT_ID
+        const clientSecret = storeConfig?.sincPaySecret || process.env.SINCPAY_CLIENT_SECRET
+
+        if (!clientId || !clientSecret) {
+            throw new Error('Configurações de Pagamento (SyncPay) não encontradas.')
+        }
+
+        const token = await SyncPay.getAuthToken(clientId, clientSecret)
+
+        // 2. Create Charge
+        const pixData = await SyncPay.createPixCharge(token, {
+            amount: price,
+            description: productName,
+            customer: {
+                name: customerName,
+                email: customerEmail, // Now sends real email if logged in
+                cpf: '48672061000', // Real CPF still needed eventually
+                phone: '11999999999'
+            }
+        })
+
+        if (pixData && pixData.txId) {
+            // Update Order with Real Transaction ID
+            await prisma.order.update({
+                where: { id: order.id },
+                data: {
+                    transactionId: String(pixData.txId),
+                    pixCode: pixData.paymentCode,
+                    pixQrCodeUrl: pixData.qrcode
+                }
+            })
+
+            return {
+                success: true,
+                orderId: order.id,
+                pixCode: pixData.paymentCode,
+                pixQrCode: pixData.qrcode,
+                transactionId: pixData.txId
+            }
+        } else {
+            throw new Error('Falha ao gerar PIX na SyncPay')
+        }
+
+    } catch (error: any) {
+        console.error('Checkout Error:', error)
+        return { success: false, error: error.message || 'Erro ao criar checkout' }
+    }
+}
+
+export async function checkOrderStatus(orderId: string) {
+    const order = await prisma.order.findUnique({
+        where: { id: orderId }
+    })
+    return order?.status || 'PENDING'
+}

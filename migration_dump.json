@@ -1,0 +1,76 @@
+{
+  "storeConfig": [
+    {
+      "id": "cmkfnm98r0000vazogp3a9j3t",
+      "storeName": "brutal",
+      "sincPayKey": "785a2a43-6061-43a8-a2fd-666383b1b4e9",
+      "sincPaySecret": "19308d4f-993c-4903-b785-9cbfb9930033",
+      "adminPassword": "1234",
+      "heroMode": "text_only",
+      "heroTitle": "TESTE",
+      "heroDescription": "teste teste teste teste test",
+      "showHeroButton": true,
+      "heroButtonText": "teste",
+      "heroButtonUrl": "t.me/elena",
+      "updatedAt": "2026-01-16T19:41:48.627Z"
+    }
+  ],
+  "categories": [],
+  "products": [
+    {
+      "id": "cmkfnphdc0001vazo2ky2aumt",
+      "name": "brutal",
+      "description": "TENHA ACESSO , TENHA ACESSO TENHA ACESSO  TENHA ACESSO TENHA ACESSO , TENHA ACESSO TENHA ACESSO  TENHA ACESSO TENHA ACESSO , TENHA ACESSO TENHA ACESSO  TENHA ACESSO TENHA ACESSO , TENHA ACESSO TENHA ACESSO  TENHA ACESSO TENHA ACESSO , TENHA ACESSO TENHA ACESSO  TENHA ACESSO TENHA ACESSO , TENHA ACESSO TENHA ACESSO  TENHA ACESSO ",
+      "price": 0,
+      "groupLink": "t.me/elena",
+      "active": true,
+      "categoryId": null,
+      "createdAt": "2026-01-15T16:21:09.552Z",
+      "updatedAt": "2026-01-15T19:48:16.619Z",
+      "media": [
+        {
+          "id": "cmkfrk39g0000vaywy6wv351e",
+          "type": "IMAGE",
+          "url": "/uploads/1768500536446_Generated_Image_January_15,_2026_-_2_37PM.jpeg",
+          "productId": "cmkfnphdc0001vazo2ky2aumt"
+        }
+      ],
+      "plans": [
+        {
+          "id": "cmkfv3u5n0001va28hhzvnncj",
+          "name": "BRUTAL VIP",
+          "price": 29.9,
+          "productId": "cmkfnphdc0001vazo2ky2aumt",
+          "createdAt": "2026-01-15T19:48:16.619Z",
+          "updatedAt": "2026-01-15T19:48:16.619Z"
+        },
+        {
+          "id": "cmkfv3u5n0002va28fkimvzr9",
+          "name": "VIP RIP",
+          "price": 39.9,
+          "productId": "cmkfnphdc0001vazo2ky2aumt",
+          "createdAt": "2026-01-15T19:48:16.619Z",
+          "updatedAt": "2026-01-15T19:48:16.619Z"
+        },
+        {
+          "id": "cmkfv3u5n0003va28g48g4nn0",
+          "name": "REAL VIP",
+          "price": 59.9,
+          "productId": "cmkfnphdc0001vazo2ky2aumt",
+          "createdAt": "2026-01-15T19:48:16.619Z",
+          "updatedAt": "2026-01-15T19:48:16.619Z"
+        }
+      ]
+    }
+  ],
+  "banners": [
+    {
+      "id": "cmkfth2nv0000vay0cubkd4hu",
+      "title": "",
+      "imageUrl": "/uploads/1768503754932_banner_Generated_Image_January_15,_2026_-_4_02PM.jpeg",
+      "active": true,
+      "createdAt": "2026-01-15T19:02:34.939Z",
+      "updatedAt": "2026-01-15T19:02:34.939Z"
+    }
+  ]
+}
