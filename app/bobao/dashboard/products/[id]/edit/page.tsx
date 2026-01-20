@@ -9,7 +9,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
     const { id } = await params
     const product = await prisma.product.findUnique({
         where: { id },
-        include: { media: true }
+        include: { media: true, plans: true }
     })
 
     if (!product) notFound()
@@ -26,7 +26,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
                 </Link>
                 <h1 className="text-3xl font-bold">Editar Produto</h1>
             </div>
-            <ProductForm categories={categories} product={product} />
+            <ProductForm categories={categories} product={product as any} />
         </div>
     )
 }

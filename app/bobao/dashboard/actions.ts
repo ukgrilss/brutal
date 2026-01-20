@@ -56,7 +56,7 @@ export async function getDashboardStats() {
         // Views (Product) -> Initiated (PENDING + PAID) -> Paid
         // We need to sum up views from all products
         const products = await prisma.product.findMany({ select: { views: true, fakeViews: true } })
-        const totalViews = products.reduce((acc, p) => acc + (p.fakeViews || p.views || 0), 0)
+        const totalViews = products.reduce((acc, p) => acc + (p.views || 0), 0)
 
         const funnel = {
             views: totalViews,

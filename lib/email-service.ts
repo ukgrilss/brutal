@@ -33,9 +33,11 @@ export async function sendEmail(to: string, subject: string, html: string) {
             html,
         })
         console.log(`✅ Email sent to ${to}`)
+        return true
     } catch (error) {
         console.error('❌ Failed to send email:', error)
         // Fallback log so password isn't lost if SMTP fails
         console.log(`[FALLBACK LOG] Content: ${html}`)
+        return false
     }
 }

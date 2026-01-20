@@ -43,9 +43,12 @@ export async function POST(req: Request) {
                     // Send Confirmation Email
                     const { sendEmail } = await import('@/lib/email-service')
 
-                    const accessLink = updatedOrder.product.type === 'VIDEO'
-                        ? `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/product/${updatedOrder.productId}`
-                        : updatedOrder.product.groupLink
+                    let accessLink = '#'
+                    if (updatedOrder.product) {
+                        accessLink = updatedOrder.product.type === 'VIDEO'
+                            ? `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/product/${updatedOrder.productId}`
+                            : (updatedOrder.product.groupLink || '#')
+                    }
 
                     const { getPurchaseConfirmationEmail } = await import('@/lib/email-templates')
                     await sendEmail(

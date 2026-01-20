@@ -51,7 +51,7 @@ export default function CustomersPage() {
         setLoading(true)
         setSelectedOrders([]) // Reset selection on filter change
         const res = await getCustomers(filter)
-        if (res.success) {
+        if (res.success && res.data) {
             setOrders(res.data)
         } else {
             toast.error(res.error)
@@ -134,13 +134,13 @@ export default function CustomersPage() {
                                 <div className="flex justify-between items-center">
                                     <label className="text-sm font-medium text-zinc-400">Mensagem</label>
                                     <div className="flex gap-2">
-                                        <Button variant="outline" size="xs" onClick={() => insertTag('<nome_cliente>')} className="text-xs h-6 border-zinc-700 text-zinc-400 hover:text-white hover:bg-zinc-800">
+                                        <Button variant="outline" size="sm" onClick={() => insertTag('<nome_cliente>')} className="text-xs h-6 border-zinc-700 text-zinc-400 hover:text-white hover:bg-zinc-800">
                                             + Nome
                                         </Button>
-                                        <Button variant="outline" size="xs" onClick={() => insertTag('<pix_code>')} className="text-xs h-6 border-zinc-700 text-zinc-400 hover:text-white hover:bg-zinc-800">
+                                        <Button variant="outline" size="sm" onClick={() => insertTag('<pix_code>')} className="text-xs h-6 border-zinc-700 text-zinc-400 hover:text-white hover:bg-zinc-800">
                                             + Pix
                                         </Button>
-                                        <Button variant="outline" size="xs" onClick={() => insertTag('<nome_produto>')} className="text-xs h-6 border-zinc-700 text-zinc-400 hover:text-white hover:bg-zinc-800">
+                                        <Button variant="outline" size="sm" onClick={() => insertTag('<nome_produto>')} className="text-xs h-6 border-zinc-700 text-zinc-400 hover:text-white hover:bg-zinc-800">
                                             + Produto
                                         </Button>
                                     </div>
@@ -182,7 +182,7 @@ export default function CustomersPage() {
                 {/* Future stats can go here */}
             </div>
 
-            <Tabs defaultValue="all" onValueChange={(v) => setFilter(v as CustomerFilter)} className="w-full">
+            <Tabs defaultValue="all" onValueChange={(v: string) => setFilter(v as CustomerFilter)} className="w-full">
                 <TabsList className="bg-zinc-900 border border-zinc-800">
                     <TabsTrigger value="all">Todos</TabsTrigger>
                     <TabsTrigger value="video_buyers">Vídeo (Pagos)</TabsTrigger>

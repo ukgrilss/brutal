@@ -52,8 +52,8 @@ export default async function HomePage() {
       heroTitle={storeConfig?.heroTitle || ''}
       heroDescription={storeConfig?.heroDescription || ''}
       showHeroButton={storeConfig?.showHeroButton !== false}
-      heroButtonText={storeConfig?.heroButtonText}
-      heroButtonUrl={storeConfig?.heroButtonUrl}
+      heroButtonText={storeConfig?.heroButtonText || undefined}
+      heroButtonUrl={storeConfig?.heroButtonUrl || undefined}
       user={user}
     />
   )

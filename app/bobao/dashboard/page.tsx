@@ -15,7 +15,7 @@ import {
     ArrowDownRight,
     Loader2
 } from 'lucide-react'
-import { Progress } from '@/components/ui/progress'
+// import { Progress } from '@/components/ui/progress'
 
 // Using local Progress if shadcn not installed or import error, but assuming basic divs for max compatibility first
 function ProgressBar({ value, colorClass }: { value: number, colorClass: string }) {

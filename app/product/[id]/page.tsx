@@ -28,6 +28,10 @@ export default async function ProductPage({
         })
     ])
 
+    if (!product) {
+        return notFound()
+    }
+
     const isAdmin = cookieStore.get('admin_session')?.value === 'true'
     const user = session?.user
 

@@ -21,7 +21,7 @@ export default function SalesPage() {
     useEffect(() => {
         async function load() {
             const res = await getSalesHistory()
-            if (res.success) {
+            if (res.success && res.data) {
                 setSales(res.data)
             }
             setLoading(false)

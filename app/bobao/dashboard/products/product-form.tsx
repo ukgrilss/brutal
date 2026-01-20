@@ -303,7 +303,7 @@ export function ProductForm({ categories, product }: ProductFormProps) {
                 {productType === 'GROUP' ? (
                     <div className="space-y-2 animate-in fade-in slide-in-from-top-2">
                         <Label htmlFor="groupLink">Link do Grupo (Entrega)</Label>
-                        <Input id="groupLink" name="groupLink" required placeholder="https://chat.whatsapp.com/..." defaultValue={product?.groupLink} />
+                        <Input id="groupLink" name="groupLink" required placeholder="https://chat.whatsapp.com/..." defaultValue={product?.groupLink || ''} />
                         <p className="text-xs text-muted-foreground">O link será exibido após a compra.</p>
                     </div>
                 ) : (

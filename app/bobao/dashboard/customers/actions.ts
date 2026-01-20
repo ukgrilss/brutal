@@ -83,11 +83,11 @@ export async function sendBulkEmail(
                     // Simple tracking replacement (if implemented later)
                     // content = content.replace(/<tracking_link>/g, `...`)
 
-                    const emailSent = await sendEmail({
-                        to: order.customerEmail,
-                        subject: subject.replace(/<nome_cliente>/g, order.customerName || 'Cliente'),
-                        html: `<div style="font-family: sans-serif; white-space: pre-wrap;">${content}</div>` // Preserve formatting
-                    })
+                    const emailSent = await sendEmail(
+                        order.customerEmail,
+                        subject.replace(/<nome_cliente>/g, order.customerName || 'Cliente'),
+                        `<div style="font-family: sans-serif; white-space: pre-wrap;">${content}</div>` // Preserve formatting
+                    )
 
                     if (emailSent) successCount++
                     else failCount++
