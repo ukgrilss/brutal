@@ -135,7 +135,13 @@ export async function createAnonymousCheckout(productId: string, planId: string 
             throw new Error('Configurações de Pagamento (SyncPay) não encontradas.')
         }
 
-        const token = await SyncPay.getAuthToken(clientId, clientSecret)
+        let token = '';
+        try {
+            token = await SyncPay.getAuthToken(clientId, clientSecret)
+        } catch (authError: any) {
+            console.error('SyncPay Auth Failed:', authError);
+            throw new Error(`Erro na autenticação com o Pagamento: ${authError.message}`);
+        }
 
         // 2. Create Charge
         const pixData = await SyncPay.createPixCharge(token, {

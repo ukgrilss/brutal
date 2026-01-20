@@ -58,6 +58,8 @@ export const SyncPay = {
 
         const token = data.access_token || data.token || data.accessToken;
 
+        console.log(`[SyncPay Debug] Auth Response Keys: ${Object.keys(data).join(', ')}`);
+
         if (!token) {
             const keys = Object.keys(data).join(', ');
             console.error(`[SyncPay] Token missing! Keys found: ${keys}`);
