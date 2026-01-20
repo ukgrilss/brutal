@@ -363,8 +363,8 @@ export function Storefront({
                                                         <span className="text-[11px] text-zinc-500 font-medium uppercase tracking-wider">A partir de:</span>
                                                         <span className="text-xl font-bold text-[#FFD700]">
                                                             {product.plans && product.plans.length > 0
-                                                                ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Math.min(...product.plans.map(p => p.price)))
-                                                                : new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.price)
+                                                                ? new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Math.min(...product.plans.map(p => p.price)) / 100)
+                                                                : new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(product.price / 100)
                                                             }
                                                         </span>
                                                     </div>
