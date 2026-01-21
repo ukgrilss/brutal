@@ -1,5 +1,5 @@
-import EmailEditor from '../../editor'
-import { getTemplate } from '../../actions'
+import EmailEditor from '../editor'
+import { getTemplate } from '../actions'
 import { notFound } from 'next/navigation'
 
 export default async function EditEmailPage({ params }: { params: Promise<{ id: string }> }) {
