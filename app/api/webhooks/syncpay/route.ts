@@ -34,7 +34,7 @@ export async function POST(req: Request) {
                 })
 
                 if (existingOrder?.status === 'PAID') {
-                    console.log(`Webhook: Transaction ${id_transaction} already processed.`)
+                    console.log(`Webhook: Transaction ${txId} already processed.`)
                     return NextResponse.json({ received: true })
                 }
 
@@ -74,4 +74,9 @@ export async function POST(req: Request) {
         console.error("Webhook Error:", error)
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
     }
+}
+
+
+export async function GET() {
+    return NextResponse.json({ status: 'Webhook Active', timestamp: new Date().toISOString() })
 }
