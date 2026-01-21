@@ -191,8 +191,8 @@ export default function CustomersPage() {
                 </TabsList>
 
                 <TabsContent value={filter} className="mt-6">
-                    <div className="rounded-md border border-zinc-800 bg-zinc-900/30 overflow-hidden">
-                        <Table>
+                    <div className="rounded-md border border-zinc-800 bg-zinc-900/30 overflow-x-auto">
+                        <Table className="min-w-[800px]">
                             <TableHeader className="bg-zinc-900">
                                 <TableRow className="border-zinc-800 hover:bg-zinc-900">
                                     <TableHead className="w-[50px]">
