@@ -29,19 +29,21 @@ function ProgressBar({ value, colorClass }: { value: number, colorClass: string 
 export default function DashboardPage() {
     const [stats, setStats] = useState<any>(null)
     const [loading, setLoading] = useState(true)
+    const [dateRange, setDateRange] = useState('today')
 
     useEffect(() => {
+        setLoading(true)
         async function load() {
-            const res = await getDashboardStats()
+            const res = await getDashboardStats(dateRange)
             if (res.success) {
                 setStats(res.data)
             }
             setLoading(false)
         }
         load()
-    }, [])
+    }, [dateRange])
 
-    if (loading) {
+    if (loading && !stats) { // Only full loader on initial load
         return (
             <div className="flex h-screen items-center justify-center">
                 <Loader2 className="w-8 h-8 animate-spin text-red-600" />
@@ -49,7 +51,7 @@ export default function DashboardPage() {
         )
     }
 
-    if (!stats) return <div className="text-white">Erro ao carregar dados.</div>
+    if (!stats && !loading) return <div className="text-white">Erro ao carregar dados.</div>
 
     const formatBRL = (cents: number) => {
         return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(cents / 100)
@@ -58,12 +60,35 @@ export default function DashboardPage() {
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
             {/* Header */}
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-3xl font-black uppercase tracking-tight text-white">Dashboard Pro</h1>
                     <p className="text-zinc-500">Visão avançada da performance da loja.</p>
                 </div>
-                <div className="flex gap-2">
+
+                <div className="flex gap-2 bg-zinc-900 p-1 rounded-lg border border-zinc-800 overflow-x-auto">
+                    {[
+                        { id: 'today', label: 'Hoje' },
+                        { id: 'yesterday', label: 'Ontem' },
+                        { id: 'week', label: 'Esta Semana' },
+                        { id: 'month', label: 'Este Mês' },
+                        { id: 'all', label: 'Todo Tempo' },
+                    ].map((filter) => (
+                        <button
+                            key={filter.id}
+                            onClick={() => setDateRange(filter.id)}
+                            className={`px-3 py-1.5 text-xs font-medium rounded-md whitespace-nowrap transition-all ${dateRange === filter.id
+                                ? 'bg-zinc-800 text-white shadow-sm'
+                                : 'text-zinc-500 hover:text-zinc-300'
+                                }`}
+                        >
+                            {loading && dateRange === filter.id ? <Loader2 className="w-3 h-3 animate-spin inline mr-1" /> : null}
+                            {filter.label}
+                        </button>
+                    ))}
+                </div>
+
+                <div className="hidden md:block">
                     <a href="/bobao/dashboard/products/new" className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg text-sm uppercase transition-colors shadow-lg shadow-red-900/20">
                         + Produto
                     </a>

@@ -2,16 +2,54 @@
 
 import { prisma } from "@/lib/db"
 
-export async function getDashboardStats() {
+export async function getDashboardStats(range: string = 'today') {
     try {
-        // 1. Basic Counts
+        // Date Logic
+        const now = new Date()
+        let startDate: Date | undefined
+        let endDate: Date | undefined
+
+        // Normalize 'now' to avoid timezone edge cases if possible, but keep simple for Server Actions
+        if (range === 'today') {
+            startDate = new Date(now.setHours(0, 0, 0, 0))
+            endDate = new Date(now.setHours(23, 59, 59, 999))
+        } else if (range === 'yesterday') {
+            const yesterday = new Date(now)
+            yesterday.setDate(yesterday.getDate() - 1)
+            startDate = new Date(yesterday.setHours(0, 0, 0, 0))
+            endDate = new Date(yesterday.setHours(23, 59, 59, 999))
+        } else if (range === 'week') {
+            // Rolling 7 days
+            const weekAgo = new Date(now)
+            weekAgo.setDate(weekAgo.getDate() - 7)
+            startDate = weekAgo
+        } else if (range === 'month') {
+            // Rolling 30 days
+            const monthAgo = new Date(now)
+            monthAgo.setDate(monthAgo.getDate() - 30)
+            startDate = monthAgo
+        } else if (range === 'all') {
+            startDate = undefined
+        }
+
+        const dateFilter = startDate ? {
+            createdAt: {
+                gte: startDate,
+                lte: endDate // undefined for 'week'/'month' means 'up to now'
+            }
+        } : {}
+
+        // 1. Basic Counts (Global - not filtered generally, but Inventory is static. Orders are dynamic)
         const productCount = await prisma.product.count()
         const categoryCount = await prisma.category.count()
         const bannerCount = await prisma.banner.count()
 
         // 2. Financial Metrics (PAID Orders)
         const paidOrders = await prisma.order.findMany({
-            where: { status: 'PAID' },
+            where: {
+                status: 'PAID',
+                ...dateFilter
+            },
             include: { user: true }
         })
 
@@ -26,7 +64,12 @@ export async function getDashboardStats() {
         const arpu = uniqueCustomers > 0 ? totalRevenue / uniqueCustomers : 0
 
         // 3. Pending / Approval Rate
-        const pendingOrdersCount = await prisma.order.count({ where: { status: 'PENDING' } })
+        const pendingOrdersCount = await prisma.order.count({
+            where: {
+                status: 'PENDING',
+                ...dateFilter
+            }
+        })
         const totalOrders = salesCount + pendingOrdersCount
         const approvalRate = totalOrders > 0 ? (salesCount / totalOrders) * 100 : 0
 
