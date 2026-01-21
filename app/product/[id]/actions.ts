@@ -158,9 +158,15 @@ export async function createAnonymousCheckout(productId: string, planId: string 
         }
 
         // 2. Create Charge
+        const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://brutal-eight-rho.vercel.app'; // Fallback to current domain if env missing
+        const webhookUrl = `${appUrl}/api/webhooks/syncpay`;
+
+        console.log('[Checkout Debug] Webhook URL:', webhookUrl);
+
         const pixData = await SyncPay.createPixCharge(token, {
             amount: price / 100, // Convert cents (200) to Reais (2.00)
             description: productName,
+            webhookUrl: webhookUrl,
             customer: {
                 name: customerName,
                 email: customerEmail, // Now sends real email if logged in

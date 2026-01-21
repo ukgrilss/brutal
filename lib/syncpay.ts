@@ -72,6 +72,7 @@ export const SyncPay = {
     async createPixCharge(token: string, data: {
         amount: number;
         description?: string;
+        webhookUrl?: string;
         customer: {
             name: string;
             cpf: string;
@@ -84,6 +85,7 @@ export const SyncPay = {
         const payload = {
             amount: data.amount,
             description: data.description || "Pagamento Loja",
+            webhook_url: data.webhookUrl,
             client: {
                 name: data.customer.name,
                 cpf: data.customer.cpf.replace(/\D/g, ''), // Remove non-digits
