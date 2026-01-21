@@ -9,23 +9,28 @@ export async function POST(req: Request) {
         // Log for debugging
         console.log("SyncPay Webhook:", body)
 
-        const { id_transaction, status } = body
+        const { id_transaction, identifier, status, payment_status } = body
 
-        // Adjust status check based on real payload examples. 
-        // Common patterns: "PAID", "CONFIRMED", "SUCCEEDED"
-        // User doc says "status da transação"
-        if (id_transaction) {
+        // Resolve Transaction ID (Docs say 'id_transaction' but response uses 'identifier', checking both)
+        const txId = id_transaction || identifier;
+
+        console.log(`[Webhook Debug] Processing Transaction ID: ${txId}, Status: ${status || payment_status}`);
+
+        // Normalize status
+        const receivedStatus = (status || payment_status || '').toUpperCase();
+
+        if (txId) {
             let orderStatus = 'PENDING'
-            if (status === 'PAID' || status === 'CONFIRMED' || status === 'APROVADO') {
+            if (['PAID', 'CONFIRMED', 'APROVADO', 'COMPLETED', 'SUCCEEDED'].includes(receivedStatus)) {
                 orderStatus = 'PAID'
-            } else if (status === 'FAILED' || status === 'CANCELLED') {
+            } else if (['FAILED', 'CANCELLED', 'RECUSADO'].includes(receivedStatus)) {
                 orderStatus = 'FAILED'
             }
 
             if (orderStatus === 'PAID') {
                 // 1. Check if already paid to prevent duplicate emails
                 const existingOrder = await prisma.order.findUnique({
-                    where: { transactionId: String(id_transaction) }
+                    where: { transactionId: String(txId) }
                 })
 
                 if (existingOrder?.status === 'PAID') {
@@ -34,7 +39,7 @@ export async function POST(req: Request) {
                 }
 
                 const updatedOrder = await prisma.order.update({
-                    where: { transactionId: String(id_transaction) },
+                    where: { transactionId: String(txId) },
                     data: { status: 'PAID' },
                     include: { product: true }
                 })
