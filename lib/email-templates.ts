@@ -140,6 +140,24 @@ export function getPurchaseConfirmationEmail(customerName: string, productName: 
                 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
                 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
             </div>
+    `
+}
+
+export function getBaseEmailHtml(headline: string, bodyContent: string) {
+    return `
+        <div style="${styles.container}">
+            <div style="${styles.header}">
+                <h1 style="${styles.logo}">LOJA<span style="color: #dc2626;">.</span></h1>
+            </div>
+            <div style="${styles.body}">
+                ${headline ? `<h1 style="${styles.h1}">${headline}</h1>` : ''}
+                
+                ${bodyContent}
+            </div>
+            <div style="${styles.footer}">
+                <p>Enviado da Loja de Grupos.</p>
+                &copy; ${new Date().getFullYear()} Loja de Grupos.
+            </div>
         </div>
     `
 }
