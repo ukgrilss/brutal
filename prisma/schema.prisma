@@ -112,3 +112,12 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model EmailTemplate {
+  id        String   @id @default(cuid())
+  name      String
+  subject   String
+  body      String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
