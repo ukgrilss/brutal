@@ -123,6 +123,14 @@ export async function createAnonymousCheckout(productId: string, planId: string 
             customerName = session.user.name
             customerEmail = session.user.email
             customerId = session.user.id
+        } else {
+            // Set cookie for anonymous persistence
+            const cookieStore = await cookies()
+            cookieStore.set('customer_email', customerEmail, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                maxAge: 60 * 60 * 24 * 30 // 30 days
+            })
         }
 
         // Create Order in DB (Pending)
