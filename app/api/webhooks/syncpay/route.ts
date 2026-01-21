@@ -9,10 +9,17 @@ export async function POST(req: Request) {
         // Log for debugging
         console.log("SyncPay Webhook:", body)
 
-        const { id_transaction, identifier, status, payment_status } = body
+        // Handle potential nested 'data' object (as seen in logs)
+        const payload = body.data || body;
 
-        // Resolve Transaction ID (Docs say 'id_transaction' but response uses 'identifier', checking both)
-        const txId = id_transaction || identifier;
+        console.log("Parsed Webhook Payload:", payload);
+
+        const { id_transaction, idtransaction, identifier, status, payment_status, externalreference } = payload
+
+        // Resolve Transaction ID (Checking all possible fields from logs)
+        // Log shows: 'idtransaction': 'f94d...', 'externalreference': '1c2a...'
+        // We stored one of these as 'transactionId' in our DB. Checking primary candidates first.
+        const txId = idtransaction || id_transaction || identifier || externalreference;
 
         console.log(`[Webhook Debug] Processing Transaction ID: ${txId}, Status: ${status || payment_status}`);
 
@@ -21,7 +28,8 @@ export async function POST(req: Request) {
 
         if (txId) {
             let orderStatus = 'PENDING'
-            if (['PAID', 'CONFIRMED', 'APROVADO', 'COMPLETED', 'SUCCEEDED'].includes(receivedStatus)) {
+            // Added 'PAID_OUT' based on user logs
+            if (['PAID', 'PAID_OUT', 'CONFIRMED', 'APROVADO', 'COMPLETED', 'SUCCEEDED'].includes(receivedStatus)) {
                 orderStatus = 'PAID'
             } else if (['FAILED', 'CANCELLED', 'RECUSADO'].includes(receivedStatus)) {
                 orderStatus = 'FAILED'
