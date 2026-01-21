@@ -66,7 +66,7 @@ export async function POST(req: Request) {
                     const { getPurchaseConfirmationEmail } = await import('@/lib/email-templates')
                     await sendEmail(
                         updatedOrder.customerEmail,
-                        `Acesso Liberado: ${updatedOrder.productName} 🚀`,
+                        `Sua compra: ${updatedOrder.productName}`,
                         getPurchaseConfirmationEmail(
                             updatedOrder.customerName,
                             updatedOrder.productName,

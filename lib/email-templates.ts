@@ -133,7 +133,12 @@ export function getPurchaseConfirmationEmail(customerName: string, productName: 
                 </p>
             </div>
             <div style="${styles.footer}">
-                &copy; ${new Date().getFullYear()} Loja de Grupos. Todos os direitos reservados.
+                <p>Este email foi enviado para <strong>${customerName}</strong> referente ao pedido de <strong>${productName}</strong>.</p>
+                &copy; ${new Date().getFullYear()} Loja de Grupos.
+            </div>
+            <div style="display:none;white-space:nowrap;font:15px courier;line-height:0;">
+                &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
+                &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
             </div>
         </div>
     `
