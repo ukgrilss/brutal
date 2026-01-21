@@ -141,8 +141,12 @@ export function CheckoutButton({ product, selectedPrice, selectedPlan, user }: {
                         </div>
                         <div>
                             <h2 className="text-3xl font-black uppercase text-white mb-2">Pagamento Confirmado!</h2>
-                            <p className="text-green-200">Seu vídeo será liberado em instantes...</p>
-                            <Loader2 className="w-6 h-6 text-green-400 animate-spin mx-auto mt-4" />
+                            <p className="text-green-200">
+                                {product.type === 'GROUP' ? 'Seu acesso ao grupo foi liberado!' : 'Seu vídeo será liberado em instantes...'}
+                            </p>
+                            {product.type !== 'GROUP' && (
+                                <Loader2 className="w-6 h-6 text-green-400 animate-spin mx-auto mt-4" />
+                            )}
                         </div>
 
                         <div className="w-full p-6 bg-black/30 rounded-xl border-2 border-green-500/50 flex flex-col items-center gap-4">
