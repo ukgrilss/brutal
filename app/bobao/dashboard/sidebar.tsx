@@ -12,7 +12,8 @@ import {
     ImagePlus,
     ExternalLink,
     Users,
-    ShoppingBag
+    ShoppingBag,
+    Mail
 } from 'lucide-react'
 import { logout } from '../actions'
 
@@ -25,6 +26,7 @@ export function AdminSidebar({ className, onLinkClick }: { className?: string, o
         { href: '/bobao/dashboard/categories', label: 'Categorias', icon: LayoutList },
         { href: '/bobao/dashboard/sales', label: 'Vendas (Extrato)', icon: ShoppingBag },
         { href: '/bobao/dashboard/customers', label: 'Clientes & CRM', icon: Users },
+        { href: '/bobao/dashboard/emails', label: 'Emails & Templates', icon: Mail },
         { href: '/bobao/dashboard/banners', label: 'Banners', icon: ImagePlus },
         { href: '/bobao/dashboard/settings', label: 'Configurações', icon: Settings },
     ]
