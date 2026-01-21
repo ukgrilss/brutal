@@ -49,10 +49,16 @@ export function CheckoutButton({ product, selectedPrice, selectedPlan, user }: {
                         setStep('paid')
                         clearInterval(interval)
 
-                        // Auto-reload after 3 seconds
-                        setTimeout(() => {
-                            window.location.reload()
-                        }, 3000)
+                        // Auto-reload after 3 seconds ONLY for VIDEO products (to unlock player)
+                        // For GROUPS, we keep the modal open so they can click the link.
+                        if (product.type !== 'GROUP') {
+                            setTimeout(() => {
+                                window.location.reload()
+                            }, 3000)
+                        } else {
+                            // Optional: Automatically open the group link?
+                            // setTimeout(() => window.open(product.groupLink, '_blank'), 2000)
+                        }
                     }
                 } catch (e) {
                     console.error("Polling error", e)
