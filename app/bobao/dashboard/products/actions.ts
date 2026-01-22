@@ -36,55 +36,25 @@ export async function createProduct(formData: FormData) {
     const files = formData.getAll('media') as File[]
     const mediaData = []
 
+    // Import direct upload helper
+    const { uploadToB2 } = await import('@/lib/b2-native')
+
     for (const file of files) {
         if (file instanceof File && file.size > 0) {
             try {
-                const fileType = file.type.startsWith('video') ? 'video' : 'image'
+                const folder = file.type.startsWith('video') ? 'videos' : 'images'
+                console.log(`Starting upload for ${file.name} to ${folder}...`)
 
-                // 1. Get B2 upload URL
-                const uploadRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/upload`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        filename: file.name,
-                        contentType: file.type,
-                        type: fileType
-                    })
-                })
+                const result = await uploadToB2(file, folder)
 
-                if (!uploadRes.ok) {
-                    console.error('Failed to get B2 upload URL:', await uploadRes.text())
-                    continue
-                }
-
-                const { uploadUrl, authorizationToken, key } = await uploadRes.json()
-
-                // 2. Upload file to B2
-                const buffer = Buffer.from(await file.arrayBuffer())
-                const b2UploadRes = await fetch(uploadUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': authorizationToken,
-                        'X-Bz-File-Name': encodeURIComponent(key),
-                        'Content-Type': file.type,
-                        'X-Bz-Content-Sha1': 'do_not_verify'
-                    },
-                    body: buffer
-                })
-
-                if (!b2UploadRes.ok) {
-                    console.error('B2 upload failed:', await b2UploadRes.text())
-                    continue
-                }
-
-                // 3. Generate public URL
-                const bucketName = process.env.B2_BUCKET_NAME
-                const publicUrl = `https://f005.backblazeb2.com/file/${bucketName}/${key}`
+                console.log(`Upload success: ${result.url}`)
 
                 const type = file.type.startsWith('video') ? 'VIDEO' : 'IMAGE'
-                mediaData.push({ type, url: publicUrl })
-            } catch (e) {
-                console.error('Error uploading file to B2:', e)
+                mediaData.push({ type, url: result.url })
+
+            } catch (e: any) {
+                console.error(`Failed to upload ${file.name}:`, e)
+                // Don't crash the whole process, just skip this file or log it clearly
             }
         }
     }
@@ -163,55 +133,23 @@ export async function updateProduct(id: string, formData: FormData) {
     const files = formData.getAll('media') as File[]
     const mediaData = []
 
+    // Import direct upload helper
+    const { uploadToB2 } = await import('@/lib/b2-native')
+
     for (const file of files) {
         if (file instanceof File && file.size > 0) {
             try {
-                const fileType = file.type.startsWith('video') ? 'video' : 'image'
+                const folder = file.type.startsWith('video') ? 'videos' : 'images'
+                console.log(`Starting upload for ${file.name} to ${folder}...`)
 
-                // 1. Get B2 upload URL
-                const uploadRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/upload`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        filename: file.name,
-                        contentType: file.type,
-                        type: fileType
-                    })
-                })
+                const result = await uploadToB2(file, folder)
 
-                if (!uploadRes.ok) {
-                    console.error('Failed to get B2 upload URL:', await uploadRes.text())
-                    continue
-                }
-
-                const { uploadUrl, authorizationToken, key } = await uploadRes.json()
-
-                // 2. Upload file to B2
-                const buffer = Buffer.from(await file.arrayBuffer())
-                const b2UploadRes = await fetch(uploadUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': authorizationToken,
-                        'X-Bz-File-Name': encodeURIComponent(key),
-                        'Content-Type': file.type,
-                        'X-Bz-Content-Sha1': 'do_not_verify'
-                    },
-                    body: buffer
-                })
-
-                if (!b2UploadRes.ok) {
-                    console.error('B2 upload failed:', await b2UploadRes.text())
-                    continue
-                }
-
-                // 3. Generate public URL
-                const bucketName = process.env.B2_BUCKET_NAME
-                const publicUrl = `https://f005.backblazeb2.com/file/${bucketName}/${key}`
+                console.log(`Upload success: ${result.url}`)
 
                 const type = file.type.startsWith('video') ? 'VIDEO' : 'IMAGE'
-                mediaData.push({ type, url: publicUrl })
-            } catch (e) {
-                console.error('Error uploading file to B2:', e)
+                mediaData.push({ type, url: result.url })
+            } catch (e: any) {
+                console.error(`Failed to upload ${file.name}:`, e)
             }
         }
     }
