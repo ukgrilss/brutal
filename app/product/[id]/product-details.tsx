@@ -106,26 +106,33 @@ export function ProductDetails({ product, isAdmin = false, user, hasAccess = fal
                                 </div>
                             </div>
 
-                            {/* Gallery Section */}
+                            {/* Gallery Section with Carousel */}
                             {product.media && product.media.filter((m: any) => m.type === 'IMAGE').length > 0 && (
                                 <div className="space-y-3 pt-6 border-t border-zinc-800/50">
                                     <h3 className="text-sm font-bold text-zinc-500 uppercase tracking-widest pl-1">Galeria & Materiais</h3>
-                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                                        {product.media
-                                            .filter((m: any) => m.type === 'IMAGE')
-                                            .map((image: any) => (
-                                                <div key={image.id} className="relative aspect-video rounded-xl overflow-hidden bg-zinc-900 border border-zinc-800 hover:border-zinc-600 transition-all cursor-pointer group">
-                                                    <img
-                                                        src={image.url}
-                                                        alt="Material de apoio"
-                                                        className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
-                                                    />
-                                                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                                        <Eye className="w-6 h-6 text-white" />
-                                                    </div>
-                                                </div>
-                                            ))}
-                                    </div>
+
+                                    <Carousel className="w-full relative" opts={{ loop: true, align: "start" }}>
+                                        <CarouselContent>
+                                            {product.media
+                                                .filter((m: any) => m.type === 'IMAGE')
+                                                .map((image: any) => (
+                                                    <CarouselItem key={image.id} className="basis-1/2 md:basis-1/3">
+                                                        <div className="relative aspect-video rounded-xl overflow-hidden bg-zinc-900 border border-zinc-800 hover:border-zinc-600 transition-all cursor-pointer group">
+                                                            <img
+                                                                src={image.url}
+                                                                alt="Material de apoio"
+                                                                className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+                                                            />
+                                                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                                <Eye className="w-6 h-6 text-white" />
+                                                            </div>
+                                                        </div>
+                                                    </CarouselItem>
+                                                ))}
+                                        </CarouselContent>
+                                        <CarouselPrevious className="left-2 bg-black/50 border-0 text-white backdrop-blur-sm" />
+                                        <CarouselNext className="right-2 bg-black/50 border-0 text-white backdrop-blur-sm" />
+                                    </Carousel>
                                 </div>
                             )}
 
