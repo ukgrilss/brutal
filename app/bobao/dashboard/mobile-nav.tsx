@@ -10,7 +10,7 @@ export function MobileNav() {
     const [open, setOpen] = useState(false)
 
     return (
-        <header className="md:hidden sticky top-0 z-40 h-16 border-b bg-background/80 backdrop-blur-md px-4 flex items-center justify-between">
+        <header className="md:hidden sticky top-0 z-50 h-16 border-b bg-background/80 backdrop-blur-md px-4 flex items-center justify-between w-full max-w-full">
             <span className="font-bold uppercase tracking-tighter">Admin Area</span>
             <Sheet open={open} onOpenChange={setOpen}>
                 <SheetTrigger asChild>

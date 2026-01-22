@@ -22,12 +22,12 @@ export default async function DashboardLayout({
     }
 
     return (
-        <div className="flex min-h-screen bg-gray-50 dark:bg-black font-sans">
+        <div className="flex min-h-screen bg-gray-50 dark:bg-black font-sans overflow-x-hidden">
             {/* Desktop Sidebar */}
             <AdminSidebar className="hidden md:flex w-64 fixed inset-y-0 z-50" />
 
             {/* Content Area */}
-            <div className="flex-1 md:ml-64 flex flex-col min-h-screen">
+            <div className="flex-1 md:ml-64 flex flex-col min-h-screen overflow-x-hidden w-full md:w-auto">
 
                 {/* Mobile Header (Logic extracted to client component) */}
                 <MobileNav />
