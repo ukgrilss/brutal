@@ -189,7 +189,7 @@ export function ProductForm({ categories, product }: ProductFormProps) {
             {/* Type Selector */}
             <div className="space-y-4 pt-4 border-b border-zinc-200 dark:border-zinc-800 pb-6 mb-6">
                 <Label className="text-base">Tipo de Produto</Label>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div
                         onClick={() => setProductType('GROUP')}
                         className={`cursor-pointer border rounded-lg p-4 flex flex-col items-center justify-center gap-2 transition-all ${productType === 'GROUP' ? 'bg-red-50 border-red-500 ring-1 ring-red-500 dark:bg-red-900/20' : 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 hover:border-red-200'}`}

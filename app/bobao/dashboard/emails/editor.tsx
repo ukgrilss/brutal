@@ -57,6 +57,7 @@ export default function EmailEditor({ initialData }: EditorProps) {
     const [subject, setSubject] = useState(initialData?.subject || '')
     const [body, setBody] = useState(initialData?.body || '')
     const [testEmail, setTestEmail] = useState('')
+    const [activeTab, setActiveTab] = useState<'editor' | 'preview'>('editor')
 
     async function handleSave() {
         if (!name || !subject || !body) return alert('Preencha todos os campos')
@@ -108,48 +109,98 @@ export default function EmailEditor({ initialData }: EditorProps) {
                 </div>
             </div>
 
-            {/* Split Screen */}
-            <div className="flex-1 grid grid-cols-2 gap-6 h-full overflow-hidden">
+            {/* Content Area */}
+            <div className="flex-1 overflow-hidden">
+                {/* Mobile: Tabs */}
+                <div className="md:hidden h-full flex flex-col">
+                    <div className="flex border-b border-zinc-800 mb-4">
+                        <button
+                            onClick={() => setActiveTab('editor')}
+                            className={`flex-1 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'editor' ? 'border-red-600 text-white' : 'border-transparent text-zinc-500'}`}
+                        >
+                            Editor
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('preview')}
+                            className={`flex-1 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'preview' ? 'border-red-600 text-white' : 'border-transparent text-zinc-500'}`}
+                        >
+                            Preview
+                        </button>
+                    </div>
 
-                {/* Left: Input */}
-                <div className="flex flex-col gap-4 h-full">
-                    <div className="space-y-2">
-                        <Label>Assunto do Email</Label>
-                        <Input
-                            value={subject}
-                            onChange={e => setSubject(e.target.value)}
-                            placeholder="Ex: Seu acesso chegou! 🚀"
-                            className="bg-zinc-900 border-zinc-700"
-                        />
-                    </div>
-                    <div className="space-y-2 flex-1 flex flex-col">
-                        <Label>Conteúdo (HTML Aceito)</Label>
-                        <Textarea
-                            value={body}
-                            onChange={e => setBody(e.target.value)}
-                            placeholder="Olá, <br/><br/> Escreva aqui seu email..."
-                            className="flex-1 bg-zinc-900 border-zinc-700 font-mono text-sm leading-relaxed p-4 resize-none"
-                        />
-                        <p className="text-xs text-zinc-500">
-                            Dica: Use <code>&lt;br/&gt;</code> para pular linhas e <code>&lt;b&gt;texto&lt;/b&gt;</code> para negrito.
-                        </p>
-                    </div>
+                    {activeTab === 'editor' ? (
+                        <div className="flex flex-col gap-4 h-full overflow-y-auto pb-20">
+                            <div className="space-y-2">
+                                <Label>Assunto do Email</Label>
+                                <Input
+                                    value={subject}
+                                    onChange={e => setSubject(e.target.value)}
+                                    placeholder="Ex: Seu acesso chegou! 🚀"
+                                    className="bg-zinc-900 border-zinc-700"
+                                />
+                            </div>
+                            <div className="space-y-2 flex-1 flex flex-col min-h-[300px]">
+                                <Label>Conteúdo (HTML Aceito)</Label>
+                                <Textarea
+                                    value={body}
+                                    onChange={e => setBody(e.target.value)}
+                                    placeholder="Olá, <br/><br/> Escreva aqui seu email..."
+                                    className="flex-1 bg-zinc-900 border-zinc-700 font-mono text-sm leading-relaxed p-4 resize-none"
+                                />
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="h-full bg-white rounded-lg overflow-hidden border border-zinc-800">
+                            <iframe
+                                srcDoc={getPreviewHtml(subject, body)}
+                                className="w-full h-full"
+                                sandbox="allow-same-origin"
+                            />
+                        </div>
+                    )}
                 </div>
 
-                {/* Right: Preview */}
-                <div className="flex flex-col gap-2 h-full">
-                    <Label className="flex items-center gap-2">
-                        <Monitor className="w-4 h-4" /> Preview em Tempo Real
-                    </Label>
-                    <div className="flex-1 border-2 border-dashed border-zinc-700 rounded-xl overflow-hidden bg-white">
-                        <iframe
-                            srcDoc={getPreviewHtml(subject, body)}
-                            className="w-full h-full"
-                            sandbox="allow-same-origin"
-                        />
+                {/* Desktop: Split Screen */}
+                <div className="hidden md:grid grid-cols-2 gap-6 h-full">
+                    {/* Left: Input */}
+                    <div className="flex flex-col gap-4 h-full">
+                        <div className="space-y-2">
+                            <Label>Assunto do Email</Label>
+                            <Input
+                                value={subject}
+                                onChange={e => setSubject(e.target.value)}
+                                placeholder="Ex: Seu acesso chegou! 🚀"
+                                className="bg-zinc-900 border-zinc-700"
+                            />
+                        </div>
+                        <div className="space-y-2 flex-1 flex flex-col">
+                            <Label>Conteúdo (HTML Aceito)</Label>
+                            <Textarea
+                                value={body}
+                                onChange={e => setBody(e.target.value)}
+                                placeholder="Olá, <br/><br/> Escreva aqui seu email..."
+                                className="flex-1 bg-zinc-900 border-zinc-700 font-mono text-sm leading-relaxed p-4 resize-none"
+                            />
+                            <p className="text-xs text-zinc-500">
+                                Dica: Use <code>&lt;br/&gt;</code> para pular linhas e <code>&lt;b&gt;texto&lt;/b&gt;</code> para negrito.
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Right: Preview */}
+                    <div className="flex flex-col gap-2 h-full">
+                        <Label className="flex items-center gap-2">
+                            <Monitor className="w-4 h-4" /> Preview em Tempo Real
+                        </Label>
+                        <div className="flex-1 border-2 border-dashed border-zinc-700 rounded-xl overflow-hidden bg-white">
+                            <iframe
+                                srcDoc={getPreviewHtml(subject, body)}
+                                className="w-full h-full"
+                                sandbox="allow-same-origin"
+                            />
+                        </div>
                     </div>
                 </div>
-
             </div>
         </div>
     )
