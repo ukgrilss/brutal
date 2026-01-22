@@ -119,7 +119,7 @@ export async function updateProduct(id: string, formData: FormData) {
     const views = parseInt(formData.get('views') as string || '0')
     const likes = parseInt(formData.get('likes') as string || '0')
     const previewDuration = parseInt(formData.get('previewDuration') as string || '0')
-
+    const videoAspectRatio = formData.get('videoAspectRatio') as string || '16/9'
 
     // Parse plans
     const plansJson = formData.get('plans') as string

@@ -112,43 +112,64 @@ async function authorizeWithAccountId() {
 }
 
 export async function getUploadParams() {
-    const auth = await authorizeWithAccountId();
+    // Retry logic for expired tokens
+    let attempts = 0;
+    while (attempts < 2) {
+        attempts++;
+        try {
+            // Force refresh on second attempt
+            if (attempts > 1) authCache = null;
 
-    let targetBucketId = auth.allowed?.bucketId;
+            const auth = await authorizeWithAccountId();
 
-    if (!targetBucketId) {
-        // Find bucket by name
-        const listRes = await fetch(`${auth.apiUrl}/b2api/v2/b2_list_buckets`, {
-            method: 'POST',
-            headers: { 'Authorization': auth.authorizationToken },
-            body: JSON.stringify({
-                accountId: auth.accountId,
-                bucketTypes: ['allPrivate', 'allPublic']
-            })
-        });
+            let targetBucketId = auth.allowed?.bucketId;
 
-        const listData = await listRes.json();
-        const bucket = listData.buckets?.find((b: any) => b.bucketName === BUCKET_NAME);
-        if (!bucket) throw new Error(`Bucket ${BUCKET_NAME} not found`);
-        targetBucketId = bucket.bucketId;
+            if (!targetBucketId) {
+                // Find bucket by name
+                const listRes = await fetch(`${auth.apiUrl}/b2api/v2/b2_list_buckets`, {
+                    method: 'POST',
+                    headers: { 'Authorization': auth.authorizationToken },
+                    body: JSON.stringify({
+                        accountId: auth.accountId,
+                        bucketTypes: ['allPrivate', 'allPublic']
+                    })
+                });
+
+                if (listRes.status === 401) throw new Error('AuthExpired');
+
+                const listData = await listRes.json();
+                const bucket = listData.buckets?.find((b: any) => b.bucketName === BUCKET_NAME);
+                if (!bucket) throw new Error(`Bucket ${BUCKET_NAME} not found`);
+                targetBucketId = bucket.bucketId;
+            }
+
+            // Get Upload URL
+            const uploadRes = await fetch(`${auth.apiUrl}/b2api/v2/b2_get_upload_url`, {
+                method: 'POST',
+                headers: { 'Authorization': auth.authorizationToken },
+                body: JSON.stringify({ bucketId: targetBucketId })
+            });
+
+            if (uploadRes.status === 401) throw new Error('AuthExpired');
+            if (!uploadRes.ok) throw new Error('Failed to get upload URL');
+
+            const uploadData = await uploadRes.json();
+
+            return {
+                uploadUrl: uploadData.uploadUrl,
+                authorizationToken: uploadData.authorizationToken,
+                bucketId: targetBucketId
+            };
+        } catch (error: any) {
+            if (error.message === 'AuthExpired' && attempts === 1) {
+                console.log('B2 Token Expired. Refreshing...');
+                authCache = null; // Clear cache and loop will retry
+                continue;
+            }
+            throw error;
+        }
     }
-
-    // Get Upload URL
-    const uploadRes = await fetch(`${auth.apiUrl}/b2api/v2/b2_get_upload_url`, {
-        method: 'POST',
-        headers: { 'Authorization': auth.authorizationToken },
-        body: JSON.stringify({ bucketId: targetBucketId })
-    });
-
-    if (!uploadRes.ok) throw new Error('Failed to get upload URL');
-
-    const uploadData = await uploadRes.json();
-
-    return {
-        uploadUrl: uploadData.uploadUrl,
-        authorizationToken: uploadData.authorizationToken,
-        bucketId: targetBucketId
-    };
+    throw new Error('Failed to get upload params after retry');
 }
 
 export async function getDownloadToken(fileName: string, durationInSeconds = 10800) { // 3 hours
