@@ -19,10 +19,10 @@ export default async function ProductsPage() {
 
     return (
         <div className="space-y-6">
-            <div className="flex justify-between items-center">
-                <h1 className="text-3xl font-bold">Produtos</h1>
+            <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
+                <h1 className="text-2xl md:text-3xl font-bold">Produtos</h1>
                 <Link href="/bobao/dashboard/products/new">
-                    <Button>Novo Produto</Button>
+                    <Button className="w-full md:w-auto">Novo Produto</Button>
                 </Link>
             </div>
 
