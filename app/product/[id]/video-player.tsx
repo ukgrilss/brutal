@@ -98,14 +98,31 @@ export function VideoPlayer({ product, hasAccess = false }: { product: any, hasA
     // Attempt to find a poster image
     const posterUrl = product.media.find((m: any) => m.type === 'IMAGE')?.url
 
+    // Aspect Ratio Logic
+    const aspectRatio = product.videoAspectRatio || '16/9';
+    let playerClass = "w-full h-full";
+    let containerStyle: any = {};
+
+    if (aspectRatio === '16/9') playerClass += " aspect-video";
+    else if (aspectRatio === '9/16') {
+        // Vertical video needs height constraint or it becomes huge
+        containerStyle = { aspectRatio: '9/16', maxHeight: '85vh', margin: '0 auto' }
+    }
+    else if (aspectRatio === '4/3') containerStyle = { aspectRatio: '4/3' }
+    else if (aspectRatio === '1/1') containerStyle = { aspectRatio: '1/1' }
+    // 'auto' leaves it fluid or object-fit cover handling
+
     return (
         <div className="space-y-4">
-            <div className="w-full rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/10 group relative bg-black">
+            <div
+                className={`w-full rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/10 group relative bg-black transition-all duration-500`}
+                style={containerStyle}
+            >
                 <MediaPlayer
                     ref={playerRef}
                     title={product.name}
                     src={videoUrl}
-                    className="w-full h-full aspect-video"
+                    className={`${playerClass} ${aspectRatio === 'auto' ? 'object-cover' : ''}`}
                     playsInline
                     onTimeUpdate={handleTimeUpdate}
                     onContextMenu={(e: any) => e.preventDefault()}

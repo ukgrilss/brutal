@@ -418,6 +418,27 @@ export function ProductForm({ categories, product }: ProductFormProps) {
                             <Input id="previewDuration" name="previewDuration" type="number" defaultValue={(product as any)?.previewDuration || 0} placeholder="0 = Sem Preview" />
                             <p className="text-xs text-muted-foreground">Se maior que 0, qualquer pessoa poderá assistir a este tempo antes de ser bloqueada.</p>
                         </div>
+
+                        <div className="space-y-2 mt-4 pt-4 border-t border-blue-200/20">
+                            <Label htmlFor="videoAspectRatio" className="text-blue-400 font-bold flex items-center gap-2">
+                                📱 Adaptador de Formato (Auto-Ajuste)
+                            </Label>
+                            <Select name="videoAspectRatio" defaultValue={(product as any)?.videoAspectRatio || "16/9"}>
+                                <SelectTrigger className="bg-zinc-900 border-zinc-700 text-white">
+                                    <SelectValue placeholder="Selecione o formato" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="16/9">Cinema (16:9) - Padrão YouTube</SelectItem>
+                                    <SelectItem value="9/16">Vertical (9:16) - TikTok/Reels/Shorts</SelectItem>
+                                    <SelectItem value="4/3">Clássico (4:3) - TV Antiga/iPad</SelectItem>
+                                    <SelectItem value="1/1">Quadrado (1:1) - Instagram Feed</SelectItem>
+                                    <SelectItem value="auto">⚡ Adaptador Automático (Preencher Tela)</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <p className="text-xs text-muted-foreground">
+                                Escolha "Vertical" para vídeos de celular ou "Adaptador Automático" para o player se ajustar ao vídeo.
+                            </p>
+                        </div>
                     </div>
                 )}
 
