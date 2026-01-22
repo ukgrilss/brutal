@@ -195,3 +195,46 @@ export async function getDownloadToken(fileName: string, durationInSeconds = 108
         finalUrl: finalUrl // Return constructed URL directly
     };
 }
+
+// Helper for direct server-side uploads
+export async function uploadToB2(file: File, folder: 'images' | 'videos') {
+    try {
+        const buffer = Buffer.from(await file.arrayBuffer());
+        const cleanName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+        const key = `${folder}/${Date.now()}_${cleanName}`;
+
+        // Get params directly (no HTTP call to own API)
+        const params = await getUploadParams();
+
+        // Perform upload to Backblaze
+        const res = await fetch(params.uploadUrl, {
+            method: 'POST',
+            headers: {
+                'Authorization': params.authorizationToken,
+                'X-Bz-File-Name': encodeURIComponent(key),
+                'Content-Type': file.type,
+                'X-Bz-Content-Sha1': 'do_not_verify'
+            },
+            body: buffer
+        });
+
+        if (!res.ok) {
+            const errorText = await res.text();
+            throw new Error(`B2 Upload Failed: ${errorText}`);
+        }
+
+        const bucketName = process.env.B2_BUCKET_NAME;
+        // B2 Friendly URL
+        const publicUrl = `https://f005.backblazeb2.com/file/${bucketName}/${key}`;
+
+        return {
+            success: true,
+            url: publicUrl,
+            key: key
+        };
+
+    } catch (error: any) {
+        console.error('Direct B2 Upload Error:', error);
+        throw error;
+    }
+}
