@@ -81,41 +81,32 @@ export function ProductForm({ categories, product }: ProductFormProps) {
         setPlans(newPlans)
     }
 
-    // Helper for direct upload
+    // Helper for proxy upload (solves CORS issues)
     async function uploadFileToB2(file: File): Promise<string> {
         return new Promise(async (resolve, reject) => {
             try {
-                // 1. Get Auth
-                const res = await fetch('/api/upload', {
+                const formData = new FormData()
+                formData.append('file', file)
+                formData.append('type', file.type.startsWith('video') ? 'video' : 'image')
+
+                // Use Proxy Route
+                const res = await fetch('/api/proxy-upload', {
                     method: 'POST',
-                    body: JSON.stringify({
-                        filename: file.name,
-                        contentType: file.type,
-                        type: file.type.startsWith('video') ? 'video' : 'image'
-                    })
+                    body: formData
                 })
-                if (!res.ok) throw new Error('Falha na API de upload')
 
-                const { uploadUrl, authorizationToken, key, fileName, publicUrl } = await res.json()
-
-                // 2. Upload XHR
-                const xhr = new XMLHttpRequest()
-                xhr.open('POST', uploadUrl, true)
-                xhr.setRequestHeader('Authorization', authorizationToken)
-                xhr.setRequestHeader('X-Bz-File-Name', encodeURIComponent(fileName))
-                xhr.setRequestHeader('Content-Type', file.type)
-                xhr.setRequestHeader('X-Bz-Content-Sha1', 'do_not_verify')
-
-                xhr.onload = () => {
-                    if (xhr.status === 200) {
-                        resolve(publicUrl)
-                    } else {
-                        reject(xhr.responseText)
-                    }
+                if (!res.ok) {
+                    const errText = await res.text()
+                    throw new Error(errText || 'Upload falhou')
                 }
-                xhr.onerror = () => reject('Erro de rede')
-                xhr.send(file)
+
+                const data = await res.json()
+                if (data.error) throw new Error(data.error)
+
+                resolve(data.publicUrl || data.url)
+
             } catch (e: any) {
+                console.error('Upload Error:', e)
                 reject(e.message)
             }
         })

@@ -223,9 +223,10 @@ export async function uploadToB2(file: File, folder: 'images' | 'videos') {
             throw new Error(`B2 Upload Failed: ${errorText}`);
         }
 
-        const bucketName = process.env.B2_BUCKET_NAME;
-        // B2 Friendly URL
-        const publicUrl = `https://f005.backblazeb2.com/file/${bucketName}/${key}`;
+        // Return Local Proxy URL (Handles private buckets and avoids CORS on viewing if used elsewhere)
+        // const publicUrl = `https://f005.backblazeb2.com/file/${bucketName}/${key}`;
+        // Use relative path for internal app usage
+        const publicUrl = `/api/file/${key}`
 
         return {
             success: true,
