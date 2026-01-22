@@ -187,8 +187,9 @@ export function ProductForm({ categories, product }: ProductFormProps) {
             setUploadProgress(0)
 
         } catch (error: any) {
-            console.error(error)
-            alert('Erro ao iniciar upload: ' + error.message)
+            console.error('Upload Error Details:', error)
+            const safeMsg = error?.message || 'Erro desconhecido'
+            alert(`[V4-FIX] Erro ao iniciar upload: ${safeMsg}`)
             setIsLoading(false)
         }
     }
