@@ -45,6 +45,9 @@ model Product {
   updatedAt   DateTime  @updatedAt
   plans       ProductPlan[]
   orders      Order[]
+  
+  order       Int       @default(0)
+  featured    Boolean   @default(false)
 }
 
 model ProductPlan {
@@ -80,6 +83,7 @@ model Media {
   id        String  @id @default(cuid())
   type      String  // "IMAGE" | "VIDEO"
   url       String  // Caminho local ou URL
+  order     Int     @default(0)
   productId String
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 }

@@ -200,3 +200,63 @@ export async function deleteMedia(mediaId: string) {
         return { success: false, error: 'Erro ao deletar mídia.' }
     }
 }
+
+export async function toggleProductFeatured(id: string) {
+    const product = await prisma.product.findUnique({ where: { id } })
+    if (!product) return { success: false }
+
+    await prisma.product.update({
+        where: { id },
+        data: { featured: !product.featured }
+    })
+    revalidatePath('/bobao/dashboard/products')
+    revalidatePath('/')
+    return { success: true }
+}
+
+export async function updateProductOrder(id: string, direction: 'up' | 'down') {
+    const product = await prisma.product.findUnique({ where: { id } })
+    if (!product) return { success: false }
+
+    // Logic: Higher order = Shows first.
+    // "Up" button -> Increase order value
+    // "Down" button -> Decrease order value
+
+    // Find adjacent product to swap with
+    const comparison = direction === 'up' ? { gt: product.order } : { lt: product.order }
+    const orderDirection = direction === 'up' ? 'asc' : 'desc'
+
+    const neighbor = await prisma.product.findFirst({
+        where: {
+            // Only swap with products that have the same 'featured' status to keep groups clean
+            featured: product.featured,
+            order: comparison
+        },
+        orderBy: { order: orderDirection as any }
+    })
+
+    if (neighbor) {
+        // Swap orders
+        await prisma.$transaction([
+            prisma.product.update({ where: { id }, data: { order: neighbor.order } }),
+            prisma.product.update({ where: { id: neighbor.id }, data: { order: product.order } })
+        ])
+    } else {
+        // Edge case: No neighbor (top or bottom of list). 
+        // Force increment/decrement to ensure it moves if logic allows (or just ignore)
+        // For 'Up' at top, do nothing.
+        // For 'Down' at bottom, do nothing.
+
+        // However, if there are products with SAME order, we need to break ties.
+        // Let's just create a gap.
+        if (direction === 'up') {
+            await prisma.product.update({ where: { id }, data: { order: { increment: 1 } } })
+        } else {
+            await prisma.product.update({ where: { id }, data: { order: { decrement: 1 } } })
+        }
+    }
+
+    revalidatePath('/bobao/dashboard/products')
+    revalidatePath('/')
+    return { success: true }
+}

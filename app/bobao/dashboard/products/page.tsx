@@ -10,10 +10,15 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { DeleteProductButton } from './delete-button'
+import { ProductSortingActions } from './product-list-actions'
 
 export default async function ProductsPage() {
     const products = await prisma.product.findMany({
-        orderBy: { createdAt: 'desc' },
+        orderBy: [
+            { featured: 'desc' },
+            { order: 'desc' },
+            { createdAt: 'desc' }
+        ],
         include: { media: true, orders: true }
     })
 
@@ -30,6 +35,7 @@ export default async function ProductsPage() {
                 <Table className="min-w-[800px]">
                     <TableHeader>
                         <TableRow>
+                            <TableHead className="w-[50px]">Ordem</TableHead>
                             <TableHead>Imagem</TableHead>
                             <TableHead>Nome</TableHead>
                             <TableHead>Tipo</TableHead>
@@ -39,8 +45,17 @@ export default async function ProductsPage() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {products.map((product) => (
-                            <TableRow key={product.id}>
+                        {products.map((product, index) => (
+                            <TableRow key={product.id} className={product.featured ? 'bg-yellow-500/5 dark:bg-yellow-500/10' : ''}>
+                                <TableCell>
+                                    <ProductSortingActions
+                                        id={product.id}
+                                        order={product.order}
+                                        featured={product.featured}
+                                        isFirst={index === 0}
+                                        isLast={index === products.length - 1}
+                                    />
+                                </TableCell>
                                 <TableCell>
                                     {product.media[0]?.type === 'VIDEO' ? (
                                         <div className="w-12 h-12 bg-zinc-800 rounded flex items-center justify-center text-xs">VÍDEO</div>
