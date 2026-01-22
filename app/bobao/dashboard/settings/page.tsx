@@ -7,7 +7,7 @@ export default async function SettingsPage() {
 
     return (
         <div className="space-y-6">
-            <h1 className="text-3xl font-bold">Configurações da Loja</h1>
+            <h1 className="text-2xl md:text-3xl font-bold">Configurações da Loja</h1>
             <Card>
                 <CardHeader>
                     <CardTitle>Integração e Segurança</CardTitle>

@@ -16,13 +16,13 @@ export default async function EmailsPage() {
 
     return (
         <div className="space-y-6">
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Emails & Templates</h1>
-                    <p className="text-muted-foreground">Crie e gerencie os modelos de email da sua loja.</p>
+                    <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Emails & Templates</h1>
+                    <p className="text-muted-foreground text-sm md:text-base">Crie e gerencie os modelos de email da sua loja.</p>
                 </div>
                 <Link href="/bobao/dashboard/emails/new">
-                    <Button>
+                    <Button className="w-full md:w-auto">
                         <Plus className="mr-2 h-4 w-4" /> Novo Template
                     </Button>
                 </Link>

@@ -23,7 +23,7 @@ export default async function BannersPage() {
 
     return (
         <div className="space-y-6">
-            <h1 className="text-3xl font-bold">Banners da Loja</h1>
+            <h1 className="text-2xl md:text-3xl font-bold">Banners da Loja</h1>
 
             <div className="grid gap-8 md:grid-cols-2">
                 {/* Create Form */}

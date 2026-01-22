@@ -44,8 +44,8 @@ export default function SalesPage() {
     return (
         <div className="space-y-6 animate-in fade-in duration-500">
             <div>
-                <h1 className="text-3xl font-black uppercase tracking-tight text-white">Minhas Vendas</h1>
-                <p className="text-zinc-500">Extrato detalhado de todas as transações aprovadas.</p>
+                <h1 className="text-2xl md:text-3xl font-black uppercase tracking-tight text-white">Minhas Vendas</h1>
+                <p className="text-zinc-500 text-sm md:text-base">Extrato detalhado de todas as transações aprovadas.</p>
             </div>
 
             <Card className="bg-zinc-900 border-zinc-800">

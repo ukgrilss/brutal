@@ -22,8 +22,8 @@ export default async function CategoriesPage() {
 
     return (
         <div className="space-y-6">
-            <h1 className="text-3xl font-bold">Categorias</h1>
-            <p className="text-zinc-400">Arraste as categorias para reordenar.</p>
+            <h1 className="text-2xl md:text-3xl font-bold">Categorias</h1>
+            <p className="text-zinc-400 text-sm md:text-base">Arraste as categorias para reordenar.</p>
 
             <div className="grid gap-8 md:grid-cols-2">
                 {/* Create Form */}
