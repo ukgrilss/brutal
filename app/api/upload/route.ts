@@ -4,11 +4,14 @@ import { getUploadParams } from '@/lib/b2-native'
 export async function POST(request: Request) {
     try {
         const body = await request.json()
-        const { filename, contentType } = body
+        const { filename, contentType, type = 'video' } = body // type: 'image' | 'video'
 
         // Create a Clean Filename
         const cleanName = filename.replace(/[^a-zA-Z0-9.-]/g, '_');
-        const key = `videos/${Date.now()}_${cleanName}`
+
+        // Organize by type: images/ or videos/
+        const folder = type === 'image' ? 'images' : 'videos'
+        const key = `${folder}/${Date.now()}_${cleanName}`
 
         // Get Native B2 Upload Parameters
         const params = await getUploadParams()
@@ -16,7 +19,7 @@ export async function POST(request: Request) {
         return NextResponse.json({
             uploadUrl: params.uploadUrl,
             authorizationToken: params.authorizationToken,
-            key: key, // This is the file name we want frontend to use
+            key: key,
             fileName: key
         })
     } catch (error: any) {

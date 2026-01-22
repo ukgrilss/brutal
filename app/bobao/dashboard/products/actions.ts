@@ -2,8 +2,6 @@
 
 import { prisma } from '@/lib/db'
 import { revalidatePath } from 'next/cache'
-import { writeFile, mkdir } from 'fs/promises'
-import path from 'path'
 export async function createProduct(formData: FormData) {
     const name = formData.get('name') as string
     const description = formData.get('description') as string
@@ -40,18 +38,53 @@ export async function createProduct(formData: FormData) {
 
     for (const file of files) {
         if (file instanceof File && file.size > 0) {
-            const buffer = Buffer.from(await file.arrayBuffer())
-            const filename = Date.now() + '_' + file.name.replace(/\s+/g, '_')
-            const uploadDir = path.join(process.cwd(), 'public', 'uploads')
-
             try {
-                await mkdir(uploadDir, { recursive: true })
-                await writeFile(path.join(uploadDir, filename), buffer)
+                const fileType = file.type.startsWith('video') ? 'video' : 'image'
+
+                // 1. Get B2 upload URL
+                const uploadRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/upload`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        filename: file.name,
+                        contentType: file.type,
+                        type: fileType
+                    })
+                })
+
+                if (!uploadRes.ok) {
+                    console.error('Failed to get B2 upload URL:', await uploadRes.text())
+                    continue
+                }
+
+                const { uploadUrl, authorizationToken, key } = await uploadRes.json()
+
+                // 2. Upload file to B2
+                const buffer = Buffer.from(await file.arrayBuffer())
+                const b2UploadRes = await fetch(uploadUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': authorizationToken,
+                        'X-Bz-File-Name': encodeURIComponent(key),
+                        'Content-Type': file.type,
+                        'X-Bz-Content-Sha1': 'do_not_verify'
+                    },
+                    body: buffer
+                })
+
+                if (!b2UploadRes.ok) {
+                    console.error('B2 upload failed:', await b2UploadRes.text())
+                    continue
+                }
+
+                // 3. Generate public URL
+                const bucketName = process.env.B2_BUCKET_NAME
+                const publicUrl = `https://f005.backblazeb2.com/file/${bucketName}/${key}`
 
                 const type = file.type.startsWith('video') ? 'VIDEO' : 'IMAGE'
-                mediaData.push({ type, url: `/uploads/${filename}` })
+                mediaData.push({ type, url: publicUrl })
             } catch (e) {
-                console.error('Error uploading file:', e)
+                console.error('Error uploading file to B2:', e)
             }
         }
     }
@@ -132,18 +165,53 @@ export async function updateProduct(id: string, formData: FormData) {
 
     for (const file of files) {
         if (file instanceof File && file.size > 0) {
-            const buffer = Buffer.from(await file.arrayBuffer())
-            const filename = Date.now() + '_' + file.name.replace(/\s+/g, '_')
-            const uploadDir = path.join(process.cwd(), 'public', 'uploads')
-
             try {
-                await mkdir(uploadDir, { recursive: true })
-                await writeFile(path.join(uploadDir, filename), buffer)
+                const fileType = file.type.startsWith('video') ? 'video' : 'image'
+
+                // 1. Get B2 upload URL
+                const uploadRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/upload`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        filename: file.name,
+                        contentType: file.type,
+                        type: fileType
+                    })
+                })
+
+                if (!uploadRes.ok) {
+                    console.error('Failed to get B2 upload URL:', await uploadRes.text())
+                    continue
+                }
+
+                const { uploadUrl, authorizationToken, key } = await uploadRes.json()
+
+                // 2. Upload file to B2
+                const buffer = Buffer.from(await file.arrayBuffer())
+                const b2UploadRes = await fetch(uploadUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': authorizationToken,
+                        'X-Bz-File-Name': encodeURIComponent(key),
+                        'Content-Type': file.type,
+                        'X-Bz-Content-Sha1': 'do_not_verify'
+                    },
+                    body: buffer
+                })
+
+                if (!b2UploadRes.ok) {
+                    console.error('B2 upload failed:', await b2UploadRes.text())
+                    continue
+                }
+
+                // 3. Generate public URL
+                const bucketName = process.env.B2_BUCKET_NAME
+                const publicUrl = `https://f005.backblazeb2.com/file/${bucketName}/${key}`
 
                 const type = file.type.startsWith('video') ? 'VIDEO' : 'IMAGE'
-                mediaData.push({ type, url: `/uploads/${filename}` })
+                mediaData.push({ type, url: publicUrl })
             } catch (e) {
-                console.error('Error uploading file:', e)
+                console.error('Error uploading file to B2:', e)
             }
         }
     }
