@@ -214,17 +214,7 @@ export function ProductDetails({ product, isAdmin = false, user, hasAccess = fal
                                         </div>
                                     </div>
 
-                                    <div className="pt-4 border-t border-white/5 flex flex-col gap-2">
-                                        <div className="flex items-center gap-2 text-zinc-500 text-xs">
-                                            <Check className="w-4 h-4 text-green-500" /> Acesso Vitalício
-                                        </div>
-                                        <div className="flex items-center gap-2 text-zinc-500 text-xs">
-                                            <Check className="w-4 h-4 text-green-500" /> Material de Apoio (PDF)
-                                        </div>
-                                        <div className="flex items-center gap-2 text-zinc-500 text-xs">
-                                            <Check className="w-4 h-4 text-green-500" /> Certificado de Conclusão
-                                        </div>
-                                    </div>
+                                    {/* Features Removed */}
                                 </div>
                             </div>
 

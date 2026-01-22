@@ -11,7 +11,7 @@ import 'vidstack/styles/community-skin/video.css';
 import { MediaPlayer, MediaOutlet, MediaCommunitySkin, MediaPoster } from '@vidstack/react';
 
 export function VideoPlayer({ product, hasAccess = false }: { product: any, hasAccess?: boolean }) {
-    // const playerRef = useRef<any>(null) // Removed
+    const playerRef = useRef<any>(null)
     const [videoUrl, setVideoUrl] = useState<string | null>(null)
     const [error, setError] = useState<string | null>(null)
     const [likes, setLikes] = useState(product.likes || 0)
@@ -50,7 +50,7 @@ export function VideoPlayer({ product, hasAccess = false }: { product: any, hasA
 
         try {
             const previewLimit = product.previewDuration || 0
-
+            // Vidstack sends detailed events, but let's be safe extracting time
             let currentTime = 0
             if (typeof event === 'number') {
                 currentTime = event
@@ -58,21 +58,24 @@ export function VideoPlayer({ product, hasAccess = false }: { product: any, hasA
                 currentTime = event.currentTime
             } else if (event?.detail?.currentTime !== undefined) {
                 currentTime = event.detail.currentTime
-            } else if (event?.target?.currentTime !== undefined) {
-                currentTime = event.target.currentTime
+            } else if (playerRef.current) {
+                currentTime = playerRef.current.currentTime
             }
 
             if (previewLimit > 0 && currentTime >= previewLimit) {
                 if (!isLocked) {
                     setIsLocked(true)
-                    const player = document.getElementById('video-player-instance') as any
-                    if (player) player.pause()
+                    if (playerRef.current) {
+                        playerRef.current.pause()
+                        // Optional: Reset to 0?
+                        // playerRef.current.currentTime = 0;
+                    }
                 }
             }
         } catch (err) {
             console.error('TimeUpdate Error:', err)
         }
-    }, [hasAccess, product.previewDuration, isLocked, setIsLocked])
+    }, [hasAccess, product.previewDuration, isLocked])
 
     if (error) {
         return (
@@ -95,13 +98,11 @@ export function VideoPlayer({ product, hasAccess = false }: { product: any, hasA
     // Attempt to find a poster image
     const posterUrl = product.media.find((m: any) => m.type === 'IMAGE')?.url
 
-
-
     return (
         <div className="space-y-4">
             <div className="w-full rounded-xl overflow-hidden shadow-2xl ring-1 ring-white/10 group relative bg-black">
                 <MediaPlayer
-                    id="video-player-instance"
+                    ref={playerRef}
                     title={product.name}
                     src={videoUrl}
                     className="w-full h-full aspect-video"
@@ -109,6 +110,15 @@ export function VideoPlayer({ product, hasAccess = false }: { product: any, hasA
                     onTimeUpdate={handleTimeUpdate}
                     onContextMenu={(e: any) => e.preventDefault()}
                     onProviderChange={onProviderChange}
+                    onLoadStart={() => console.log('Video Loading Started:', videoUrl)}
+                    onCanPlay={() => console.log('Video Can Play!')}
+                    onWaiting={() => console.log('Video Buffering/Waiting...')}
+                    onError={(e: any) => {
+                        console.error('Video Player Error:', e)
+                        // Show error on screen for debugging
+                        const msg = e?.detail?.message || e?.type || 'Erro desconhecido';
+                        setError(`Erro no Player: ${msg}. (Tente recarregar)`)
+                    }}
                     storage={null} // Disable Vidstack local storage persistence
                 >
                     <MediaOutlet>
