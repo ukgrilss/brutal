@@ -33,28 +33,34 @@ export async function createProduct(formData: FormData) {
         console.error("Error parsing plans:", e)
     }
 
-    const files = formData.getAll('media') as File[]
-    const mediaData = []
+    // Parse media from JSON (Client-side upload)
+    const mediaJson = formData.get('media_json') as string
+    let mediaData: { type: string, url: string }[] = []
 
-    // Import direct upload helper
-    const { uploadToB2 } = await import('@/lib/b2-native')
+    try {
+        if (mediaJson) {
+            mediaData = JSON.parse(mediaJson)
+        }
+    } catch (e) {
+        console.error("Error parsing media_json:", e)
+    }
 
-    for (const file of files) {
-        if (file instanceof File && file.size > 0) {
-            try {
-                const folder = file.type.startsWith('video') ? 'videos' : 'images'
-                console.log(`Starting upload for ${file.name} to ${folder}...`)
-
-                const result = await uploadToB2(file, folder)
-
-                console.log(`Upload success: ${result.url}`)
-
-                const type = file.type.startsWith('video') ? 'VIDEO' : 'IMAGE'
-                mediaData.push({ type, url: result.url })
-
-            } catch (e: any) {
-                console.error(`Failed to upload ${file.name}:`, e)
-                // Don't crash the whole process, just skip this file or log it clearly
+    // Fallback: If no JSON, try old file method
+    if (mediaData.length === 0) {
+        const files = formData.getAll('media') as File[]
+        if (files.length > 0 && files[0].size > 0) {
+            const { uploadToB2 } = await import('@/lib/b2-native')
+            for (const file of files) {
+                if (file instanceof File && file.size > 0) {
+                    try {
+                        const folder = file.type.startsWith('video') ? 'videos' : 'images'
+                        const result = await uploadToB2(file, folder)
+                        const type = file.type.startsWith('video') ? 'VIDEO' : 'IMAGE'
+                        mediaData.push({ type, url: result.url })
+                    } catch (e) {
+                        console.error(`Fallback upload failed for ${file.name}:`, e)
+                    }
+                }
             }
         }
     }
@@ -130,26 +136,35 @@ export async function updateProduct(id: string, formData: FormData) {
         console.error("Error parsing plans:", e)
     }
 
-    const files = formData.getAll('media') as File[]
-    const mediaData = []
+    // Parse media from JSON (Client-side upload)
+    const mediaJson = formData.get('media_json') as string
+    let mediaData: { type: string, url: string }[] = []
 
-    // Import direct upload helper
-    const { uploadToB2 } = await import('@/lib/b2-native')
+    try {
+        if (mediaJson) {
+            mediaData = JSON.parse(mediaJson)
+        }
+    } catch (e) {
+        console.error("Error parsing media_json:", e)
+    }
 
-    for (const file of files) {
-        if (file instanceof File && file.size > 0) {
-            try {
-                const folder = file.type.startsWith('video') ? 'videos' : 'images'
-                console.log(`Starting upload for ${file.name} to ${folder}...`)
-
-                const result = await uploadToB2(file, folder)
-
-                console.log(`Upload success: ${result.url}`)
-
-                const type = file.type.startsWith('video') ? 'VIDEO' : 'IMAGE'
-                mediaData.push({ type, url: result.url })
-            } catch (e: any) {
-                console.error(`Failed to upload ${file.name}:`, e)
+    // Fallback: If no JSON, try old file method (should not happen with new form, but keep safe)
+    if (mediaData.length === 0) {
+        const files = formData.getAll('media') as File[]
+        // Import direct upload helper only if needed
+        if (files.length > 0 && files[0].size > 0) {
+            const { uploadToB2 } = await import('@/lib/b2-native')
+            for (const file of files) {
+                if (file instanceof File && file.size > 0) {
+                    try {
+                        const folder = file.type.startsWith('video') ? 'videos' : 'images'
+                        const result = await uploadToB2(file, folder)
+                        const type = file.type.startsWith('video') ? 'VIDEO' : 'IMAGE'
+                        mediaData.push({ type, url: result.url })
+                    } catch (e) {
+                        console.error(`Fallback upload failed for ${file.name}:`, e)
+                    }
+                }
             }
         }
     }
