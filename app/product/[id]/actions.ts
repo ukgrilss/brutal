@@ -61,7 +61,20 @@ export async function startVideoSession(productId: string) {
     }
 
     try {
-        const { finalUrl } = await getDownloadToken(product.contentUrl)
+        // Fix: contentUrl might be a full URL, but getDownloadToken expects just the KEY (filename)
+        // Format: https://f005.backblazeb2.com/file/<BUCKET>/<KEY>
+        let fileKey = product.contentUrl
+        if (fileKey.includes('/file/')) {
+            const parts = fileKey.split(/\/file\/[^\/]+\//)
+            if (parts.length > 1) {
+                fileKey = parts[1]
+            }
+        }
+
+        // Also remove any query params if present
+        fileKey = fileKey.split('?')[0]
+
+        const { finalUrl } = await getDownloadToken(fileKey)
         console.log('Video Session Generated:', { productId, url: finalUrl })
         return { success: true, url: finalUrl }
     } catch (error: any) {
