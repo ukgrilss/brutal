@@ -62,11 +62,11 @@ export default function DashboardPage() {
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-black uppercase tracking-tight text-white">Dashboard Pro</h1>
-                    <p className="text-zinc-500">Visão avançada da performance da loja.</p>
+                    <h1 className="text-xl md:text-3xl font-black uppercase tracking-tight text-white">Dashboard Pro</h1>
+                    <p className="text-zinc-500 text-sm md:text-base">Visão avançada da performance da loja.</p>
                 </div>
 
-                <div className="flex gap-2 bg-zinc-900 p-1 rounded-lg border border-zinc-800 overflow-x-auto">
+                <div className="flex flex-wrap gap-2 bg-transparent md:bg-zinc-900 md:p-1 md:rounded-lg md:border md:border-zinc-800">
                     {[
                         { id: 'today', label: 'Hoje' },
                         { id: 'yesterday', label: 'Ontem' },
