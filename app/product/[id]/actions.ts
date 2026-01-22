@@ -74,9 +74,15 @@ export async function startVideoSession(productId: string) {
         // Also remove any query params if present
         fileKey = fileKey.split('?')[0]
 
-        const { finalUrl } = await getDownloadToken(fileKey)
-        console.log('Video Session Generated:', { productId, url: finalUrl })
-        return { success: true, url: finalUrl }
+        // Defensively ensure 'videos/' prefix if key seems to be just a filename
+        if (!fileKey.startsWith('videos/') && !fileKey.includes('/')) {
+            fileKey = `videos/${fileKey}`
+        }
+
+        // Return Proxy Stream URL
+        const proxyUrl = `/api/video/stream/${fileKey}`
+        console.log('Video Session Proxy:', { productId, url: proxyUrl })
+        return { success: true, url: proxyUrl }
     } catch (error: any) {
         console.error('Video Session Error:', error)
         return { success: false, error: `Erro B2: ${error.message}` }

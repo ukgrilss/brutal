@@ -115,9 +115,9 @@ export function VideoPlayer({ product, hasAccess = false }: { product: any, hasA
                     onWaiting={() => console.log('Video Buffering/Waiting...')}
                     onError={(e: any) => {
                         console.error('Video Player Error:', e)
-                        // Show error on screen for debugging
                         const msg = e?.detail?.message || e?.type || 'Erro desconhecido';
-                        setError(`Erro no Player: ${msg}. (Tente recarregar)`)
+                        // Show generic error + visible URL for debug
+                        setError(`Erro no Player: ${msg}. URL: ${videoUrl?.substring(0, 50)}...`)
                     }}
                     storage={null} // Disable Vidstack local storage persistence
                 >
