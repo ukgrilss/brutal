@@ -20,7 +20,8 @@ export async function POST(request: Request) {
             uploadUrl: params.uploadUrl,
             authorizationToken: params.authorizationToken,
             key: key,
-            fileName: key
+            fileName: key,
+            publicUrl: `https://f005.backblazeb2.com/file/${process.env.B2_BUCKET_NAME}/${key}`
         })
     } catch (error: any) {
         console.error('Error generating B2 upload URL:', error)
