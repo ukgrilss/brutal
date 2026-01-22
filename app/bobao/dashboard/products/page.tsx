@@ -26,8 +26,8 @@ export default async function ProductsPage() {
                 </Link>
             </div>
 
-            <div className="rounded-md border bg-white dark:bg-gray-800">
-                <Table>
+            <div className="rounded-md border bg-white dark:bg-gray-800 overflow-x-auto">
+                <Table className="min-w-[800px]">
                     <TableHeader>
                         <TableRow>
                             <TableHead>Imagem</TableHead>

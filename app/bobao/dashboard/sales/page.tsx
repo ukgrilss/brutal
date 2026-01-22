@@ -56,8 +56,8 @@ export default function SalesPage() {
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className="rounded-md border border-zinc-800 overflow-hidden">
-                        <Table>
+                    <div className="rounded-md border border-zinc-800 overflow-x-auto">
+                        <Table className="min-w-[800px]">
                             <TableHeader className="bg-zinc-950">
                                 <TableRow className="border-zinc-800 hover:bg-zinc-900">
                                     <TableHead className="text-zinc-400">Data</TableHead>
