@@ -247,7 +247,18 @@ export function ProductDetails({ product, isAdmin = false, user, hasAccess = fal
                                             {item.type === 'IMAGE' ? (
                                                 <img src={item.url} alt="Produto" className="w-full h-full object-cover" />
                                             ) : (
-                                                <video src={item.url} controls className="w-full h-full object-contain" />
+                                                <video
+                                                    src={item.url}
+                                                    controls
+                                                    playsInline
+                                                    preload="metadata"
+                                                    className="w-full h-full object-contain bg-black"
+                                                    onError={(e) => {
+                                                        const target = e.target as HTMLVideoElement;
+                                                        target.style.display = 'none';
+                                                        target.parentElement?.insertAdjacentHTML('beforeend', '<div class="absolute inset-0 flex items-center justify-center text-red-500 text-xs px-2 text-center">Erro ao carregar vídeo. Verifique formato/permissão.</div>');
+                                                    }}
+                                                />
                                             )}
                                         </div>
                                     </CarouselItem>
