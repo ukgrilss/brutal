@@ -187,6 +187,7 @@ export async function updateProduct(id: string, formData: FormData) {
                 likes,
                 categoryId,
                 media: {
+                    deleteMany: {}, // Delete existing media to sync with form state
                     create: mediaData
                 },
                 plans: {

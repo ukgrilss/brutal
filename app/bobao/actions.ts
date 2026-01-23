@@ -23,7 +23,11 @@ export async function login(prevState: unknown, formData: FormData) {
 
     if (email === MASTER_EMAIL && password === MASTER_PASS) {
         const cookieStore = await cookies()
-        cookieStore.set('admin_session', 'true', { httpOnly: true, path: '/' })
+        cookieStore.set('admin_session', 'true', {
+            httpOnly: true,
+            path: '/',
+            maxAge: 60 * 60 * 24 * 30 // 30 Days persistence
+        })
         return { success: true }
     } else {
         return { success: false, error: 'Credenciais inválidas' }
