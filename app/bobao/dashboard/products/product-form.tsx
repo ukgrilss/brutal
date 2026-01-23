@@ -81,15 +81,72 @@ export function ProductForm({ categories, product }: ProductFormProps) {
         setPlans(newPlans)
     }
 
-    // Helper for proxy upload (solves CORS issues)
-    async function uploadFileToB2(file: File): Promise<string> {
+    // Helper for upload (Video = Direct XHR; Image = Proxy)
+    async function uploadFileToB2(file: File, onProgress?: (pct: number) => void): Promise<string> {
         return new Promise(async (resolve, reject) => {
             try {
+                // VIDEO: Direct Upload to B2 (Bypass Vercel 4.5MB limit)
+                if (file.type.startsWith('video')) {
+                    // 1. Get Params from Server
+                    const paramsRes = await fetch('/api/upload', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            filename: file.name,
+                            contentType: file.type,
+                            type: 'video'
+                        })
+                    })
+
+                    if (!paramsRes.ok) {
+                        const err = await paramsRes.json().catch(() => ({}))
+                        throw new Error(err.error || 'Falha ao obter permissão de upload')
+                    }
+
+                    const params = await paramsRes.json()
+                    const { uploadUrl, authorizationToken, key, publicUrl } = params
+
+                    // 2. Direct XHR Upload
+                    const xhr = new XMLHttpRequest()
+                    xhr.open('POST', uploadUrl, true)
+
+                    xhr.setRequestHeader('Authorization', authorizationToken)
+                    // Encode URL but restore slashes for folder structure (optional, B2 handles encoded slashes too usually)
+                    // Ensuring safe filename encoding
+                    xhr.setRequestHeader('X-Bz-File-Name', encodeURIComponent(key).split('%2F').join('/'))
+                    xhr.setRequestHeader('Content-Type', file.type)
+                    xhr.setRequestHeader('X-Bz-Content-Sha1', 'do_not_verify')
+
+                    xhr.upload.onprogress = (e) => {
+                        if (e.lengthComputable && onProgress) {
+                            const percentComplete = (e.loaded / e.total) * 100
+                            onProgress(percentComplete)
+                        }
+                    }
+
+                    xhr.onload = () => {
+                        if (xhr.status >= 200 && xhr.status < 300) {
+                            resolve(publicUrl)
+                        } else {
+                            try {
+                                const resp = JSON.parse(xhr.responseText)
+                                reject(resp.message || resp.code || `Erro B2: ${xhr.status}`)
+                            } catch (e) {
+                                reject(`Erro B2: ${xhr.status} ${xhr.responseText}`)
+                            }
+                        }
+                    }
+
+                    xhr.onerror = () => reject('Erro de rede no upload (XHR)')
+
+                    xhr.send(file)
+                    return
+                }
+
+                // IMAGE: Use Proxy (Simpler)
                 const formData = new FormData()
                 formData.append('file', file)
-                formData.append('type', file.type.startsWith('video') ? 'video' : 'image')
+                formData.append('type', 'image')
 
-                // Use Proxy Route
                 const res = await fetch('/api/proxy-upload', {
                     method: 'POST',
                     body: formData
@@ -103,6 +160,7 @@ export function ProductForm({ categories, product }: ProductFormProps) {
                 const data = await res.json()
                 if (data.error) throw new Error(data.error)
 
+                if (onProgress) onProgress(100)
                 resolve(data.publicUrl || data.url)
 
             } catch (e: any) {
@@ -163,7 +221,7 @@ export function ProductForm({ categories, product }: ProductFormProps) {
 
         setIsLoading(true)
         try {
-            const uploadedUrl = await uploadFileToB2(file)
+            const uploadedUrl = await uploadFileToB2(file, (p) => setUploadProgress(p))
             // Extract Key from URL if needed, or just store the full URL
             // Current implementation expects 'contentUrl' to be the key for B2,
             // but for simplicity let's store the full URL or extract Key.
