@@ -40,7 +40,7 @@ export default async function CategoriesPage() {
                             <div className="grid gap-2">
                                 <Label htmlFor="image">Imagem (Opcional - Ideal para o Carrossel)</Label>
                                 <Input id="image" name="image" type="file" accept="image/png, image/jpeg, image/webp" />
-                                <p className="text-[10px] text-zinc-500">Formatos aceitos: PNG, JPG ou WEBP.</p>
+                                <p className="text-[10px] text-zinc-500">Recomendado: Vertical 2:3 (ex: 800x1200 px). Formatos: JPG/PNG.</p>
                             </div>
                             <Button type="submit">Adicionar Categoria</Button>
                         </form>
