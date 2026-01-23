@@ -73,7 +73,7 @@ async function main() {
                         "b2_upload_file",
                         "b2_upload_part"
                     ],
-                    allowedHeaders: ["authorization", "range"],
+                    allowedHeaders: ["authorization", "range", "x-bz-file-name", "x-bz-content-sha1", "content-type", "x-bz-part-number"],
                     exposeHeaders: ["x-bz-content-sha1"],
                     maxAgeSeconds: 3600
                 }

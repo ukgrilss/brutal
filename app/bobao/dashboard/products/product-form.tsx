@@ -246,8 +246,8 @@ export function ProductForm({ categories, product }: ProductFormProps) {
 
         } catch (error: any) {
             console.error('Upload Error Details:', error)
-            const safeMsg = error?.message || 'Erro desconhecido'
-            alert(`[V4-FIX] Erro ao iniciar upload: ${safeMsg}`)
+            const safeMsg = (typeof error === 'string' ? error : (error?.message || JSON.stringify(error))) || 'Erro desconhecido'
+            alert(`[V5-DIAG] Erro: ${safeMsg}`)
             setIsLoading(false)
         }
     }
