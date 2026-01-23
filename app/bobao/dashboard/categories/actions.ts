@@ -76,6 +76,39 @@ export async function updateCategoryOrderBulk(items: { id: string, order: number
     }
 }
 
+export async function updateCategory(id: string, formData: FormData) {
+    const name = formData.get('name') as string
+
+    let imageUrl = undefined
+
+    const file = formData.get('image') as File
+    if (file && file.size > 0) {
+        const buffer = Buffer.from(await file.arrayBuffer())
+        const filename = Date.now() + '_cat_' + file.name.replace(/\s+/g, '_')
+        const uploadDir = path.join(process.cwd(), 'public', 'uploads')
+        try {
+            await mkdir(uploadDir, { recursive: true })
+            await writeFile(path.join(uploadDir, filename), buffer)
+            imageUrl = `/uploads/${filename}`
+        } catch (e) {
+            console.error('Error uploading category image:', e)
+        }
+    }
+
+    await prisma.category.update({
+        where: { id },
+        data: {
+            name: name || undefined,
+            imageUrl: imageUrl // If undefined, prisma ignores it (only updates if not undefined? No, prisma undefined deletes? No. In update, undefined does nothing. null sets to null. verify syntax.)
+            // Actually prisma client treats undefined as "do not touch".
+        }
+    })
+
+    revalidatePath('/bobao/dashboard/categories')
+    revalidatePath('/')
+    return { success: true }
+}
+
 export async function getCategories() {
-    return await prisma.category.findMany({ orderBy: { createdAt: 'desc' } })
+    return await prisma.category.findMany({ orderBy: { order: 'asc' } }) // Ordering by order!
 }

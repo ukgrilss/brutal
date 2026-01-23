@@ -5,6 +5,7 @@ import { Reorder, useDragControls } from 'framer-motion'
 import { CategoryItem } from './category-item' // We can reuse the inner look
 import { GripVertical } from 'lucide-react'
 import { updateCategoryOrderBulk } from './actions'
+import { EditCategoryDialog } from './edit-category-dialog'
 
 interface Category {
     id: string
@@ -45,6 +46,9 @@ export function CategoryReorderList({ initialCategories }: { initialCategories: 
                         <GripVertical className="text-zinc-400 w-5 h-5" />
                         <div className="flex-1">
                             <CategoryItem category={item} hideOrderInput={true} />
+                            <div className="ml-2">
+                                <EditCategoryDialog category={item} />
+                            </div>
                         </div>
                     </div>
                 </Reorder.Item>
