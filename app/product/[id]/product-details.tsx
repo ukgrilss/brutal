@@ -16,6 +16,7 @@ import { CheckoutButton } from './checkout-button'
 import { LoginForm } from './login-form'
 import { VideoPlayer } from './video-player'
 import { getMediaUrl } from '@/lib/media-utils'
+import { AuthenticatedVideo } from './authenticated-video'
 
 export function ProductDetails({ product, isAdmin = false, user, hasAccess = false }: { product: any, isAdmin?: boolean, user?: any, hasAccess?: boolean }) {
     // If plans exist, default to the first one, otherwise null
@@ -248,17 +249,9 @@ export function ProductDetails({ product, isAdmin = false, user, hasAccess = fal
                                             {item.type === 'IMAGE' ? (
                                                 <img src={getMediaUrl(item.url)} alt="Produto" className="w-full h-full object-cover" />
                                             ) : (
-                                                <video
-                                                    src={getMediaUrl(item.url)}
-                                                    controls
-                                                    playsInline
-                                                    preload="metadata"
+                                                <AuthenticatedVideo
+                                                    src={item.url}
                                                     className="w-full h-full object-contain bg-black"
-                                                    onError={(e) => {
-                                                        const target = e.target as HTMLVideoElement;
-                                                        target.style.display = 'none';
-                                                        target.parentElement?.insertAdjacentHTML('beforeend', '<div class="absolute inset-0 flex items-center justify-center text-red-500 text-xs px-2 text-center">Erro ao carregar vídeo. Verifique formato/permissão.</div>');
-                                                    }}
                                                 />
                                             )}
                                         </div>
