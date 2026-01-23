@@ -246,10 +246,10 @@ export function ProductDetails({ product, isAdmin = false, user, hasAccess = fal
                                     <CarouselItem key={item.id}>
                                         <div className="aspect-[4/5] relative rounded-3xl overflow-hidden bg-zinc-900 shadow-2xl border border-white/5">
                                             {item.type === 'IMAGE' ? (
-                                                <img src={item.url} alt="Produto" className="w-full h-full object-cover" />
+                                                <img src={getMediaUrl(item.url)} alt="Produto" className="w-full h-full object-cover" />
                                             ) : (
                                                 <video
-                                                    src={item.url}
+                                                    src={getMediaUrl(item.url)}
                                                     controls
                                                     playsInline
                                                     preload="metadata"
