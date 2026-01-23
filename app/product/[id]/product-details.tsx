@@ -243,7 +243,7 @@ export function ProductDetails({ product, isAdmin = false, user, hasAccess = fal
                             <CarouselContent>
                                 {product.media.map((item: any) => (
                                     <CarouselItem key={item.id}>
-                                        <div className="aspect-square relative rounded-3xl overflow-hidden bg-zinc-900 shadow-2xl border border-white/5">
+                                        <div className="aspect-[4/5] relative rounded-3xl overflow-hidden bg-zinc-900 shadow-2xl border border-white/5">
                                             {item.type === 'IMAGE' ? (
                                                 <img src={item.url} alt="Produto" className="w-full h-full object-cover" />
                                             ) : (
