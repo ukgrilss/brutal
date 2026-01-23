@@ -14,6 +14,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { DeleteProductButton } from './delete-button'
 import { ProductSortingActions } from './product-list-actions'
+import { getMediaUrl } from '@/lib/media-utils'
 
 interface Product {
     id: string
@@ -76,7 +77,7 @@ export function ProductTabs({ products }: { products: Product[] }) {
                                         <div className="w-12 h-12 bg-zinc-800 rounded flex items-center justify-center text-xs text-zinc-500">Video</div>
                                     ) : (
                                         <img
-                                            src={product.media[0]?.url || '/placeholder.png'}
+                                            src={getMediaUrl(product.media[0]?.url) || '/placeholder.png'}
                                             alt={product.name}
                                             className="w-12 h-12 rounded object-cover"
                                         />

@@ -15,6 +15,7 @@ import {
 import { CheckoutButton } from './checkout-button'
 import { LoginForm } from './login-form'
 import { VideoPlayer } from './video-player'
+import { getMediaUrl } from '@/lib/media-utils'
 
 export function ProductDetails({ product, isAdmin = false, user, hasAccess = false }: { product: any, isAdmin?: boolean, user?: any, hasAccess?: boolean }) {
     // If plans exist, default to the first one, otherwise null
