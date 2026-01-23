@@ -57,16 +57,17 @@ async function main() {
 
         console.log(`✅ Bucket Found: ${bucket.bucketId}`);
 
-        console.log('3. Updating Bucket CORS...');
+        console.log('3. Updating Bucket to PUBLIC...');
         const updateRes = await request(`${apiUrl}/b2api/v2/b2_update_bucket`, 'POST', {
             'Authorization': authorizationToken
         }, {
             accountId: accountId,
             bucketId: bucket.bucketId,
+            bucketType: 'allPublic', // <--- CRITICAL CHANGE
             corsRules: [
                 {
                     corsRuleName: "allowAny",
-                    allowedOrigins: ["*"], // Allow ALL for now (localhost + production)
+                    allowedOrigins: ["*"],
                     allowedOperations: [
                         "b2_download_file_by_name",
                         "b2_download_file_by_id",
