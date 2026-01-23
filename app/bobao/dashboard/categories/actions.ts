@@ -13,16 +13,15 @@ export async function createCategory(formData: FormData) {
 
     const file = formData.get('image') as File
     if (file && file.size > 0) {
-        const buffer = Buffer.from(await file.arrayBuffer())
-        const filename = Date.now() + '_cat_' + file.name.replace(/\s+/g, '_')
-        const uploadDir = path.join(process.cwd(), 'public', 'uploads')
-
+        // Upload to B2 instead of local FS
+        const { uploadToB2 } = await import('@/lib/b2-native')
         try {
-            await mkdir(uploadDir, { recursive: true })
-            await writeFile(path.join(uploadDir, filename), buffer)
-            imageUrl = `/uploads/${filename}`
+            const result = await uploadToB2(file, 'images')
+            // result.url is the public B2 URL (e.g. https://f005...)
+            // We save this, and the frontend will handle signing it (or server side signing)
+            imageUrl = result.url
         } catch (e) {
-            console.error('Error uploading category image:', e)
+            console.error('Error uploading category image to B2:', e)
         }
     }
 
@@ -83,15 +82,12 @@ export async function updateCategory(id: string, formData: FormData) {
 
     const file = formData.get('image') as File
     if (file && file.size > 0) {
-        const buffer = Buffer.from(await file.arrayBuffer())
-        const filename = Date.now() + '_cat_' + file.name.replace(/\s+/g, '_')
-        const uploadDir = path.join(process.cwd(), 'public', 'uploads')
+        const { uploadToB2 } = await import('@/lib/b2-native')
         try {
-            await mkdir(uploadDir, { recursive: true })
-            await writeFile(path.join(uploadDir, filename), buffer)
-            imageUrl = `/uploads/${filename}`
+            const result = await uploadToB2(file, 'images')
+            imageUrl = result.url
         } catch (e) {
-            console.error('Error uploading category image:', e)
+            console.error('Error uploading category image to B2:', e)
         }
     }
 
