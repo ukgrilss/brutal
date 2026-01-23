@@ -3,10 +3,11 @@ import { getDownloadToken } from '@/lib/b2-native'
 
 export async function GET(
     request: Request,
-    { params }: { params: { path: string[] } }
+    { params }: { params: Promise<{ path: string[] }> }
 ) {
     try {
-        const filePath = params.path.join('/')
+        const { path } = await params
+        const filePath = path.join('/')
 
         // 1. Generate Signed URL
         const { finalUrl } = await getDownloadToken(filePath, 3600)
