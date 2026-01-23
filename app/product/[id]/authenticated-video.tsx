@@ -11,6 +11,8 @@ interface AuthenticatedVideoProps {
 export function AuthenticatedVideo({ src, className }: AuthenticatedVideoProps) {
     const [signedUrl, setSignedUrl] = useState<string | null>(null)
     const [error, setError] = useState(false)
+    const [isPlaying, setIsPlaying] = useState(false)
+    const videoRef = useRef<HTMLVideoElement>(null)
 
     useEffect(() => {
         // If it's not a B2 URL, use it directly
@@ -20,10 +22,12 @@ export function AuthenticatedVideo({ src, className }: AuthenticatedVideoProps) 
         }
 
         // Fetch signed URL
+        const controller = new AbortController()
         fetch('/api/sign-url', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ path: src })
+            body: JSON.stringify({ path: src }),
+            signal: controller.signal
         })
             .then(res => res.json())
             .then(data => {
@@ -35,10 +39,48 @@ export function AuthenticatedVideo({ src, className }: AuthenticatedVideoProps) 
                 }
             })
             .catch(err => {
-                console.error('Sign URL network error:', err)
-                setError(true)
+                if (err.name !== 'AbortError') {
+                    console.error('Sign URL network error:', err)
+                    setError(true)
+                }
             })
+
+        return () => controller.abort()
     }, [src])
+
+    // Toggle Play
+    const togglePlay = () => {
+        if (videoRef.current) {
+            if (isPlaying) {
+                videoRef.current.pause()
+            } else {
+                videoRef.current.play()
+            }
+            setIsPlaying(!isPlaying)
+        }
+    }
+
+    // Handle end of video
+    useEffect(() => {
+        const video = videoRef.current
+        const onEnded = () => setIsPlaying(false)
+        const onPause = () => setIsPlaying(false)
+        const onPlay = () => setIsPlaying(true)
+
+        if (video) {
+            video.addEventListener('ended', onEnded)
+            video.addEventListener('pause', onPause)
+            video.addEventListener('play', onPlay)
+        }
+
+        return () => {
+            if (video) {
+                video.removeEventListener('ended', onEnded)
+                video.removeEventListener('pause', onPause)
+                video.removeEventListener('play', onPlay)
+            }
+        }
+    }, [signedUrl]) // Re-attach when url changes and ref is populated
 
     if (error) {
         return (
@@ -57,16 +99,31 @@ export function AuthenticatedVideo({ src, className }: AuthenticatedVideoProps) 
     }
 
     return (
-        <video
-            src={signedUrl}
-            controls
-            playsInline
-            preload="metadata"
-            className={className}
-            onError={(e) => {
-                console.error('Video Playback Error', e)
-                // Fallback UI handled by parent mostly, but we can show something
-            }}
-        />
+        <div className={`relative group ${className}`} onContextMenu={(e) => e.preventDefault()}>
+            <video
+                ref={videoRef}
+                src={signedUrl}
+                className="w-full h-full object-contain"
+                playsInline
+                preload="metadata"
+                controlsList="nodownload"
+                disablePictureInPicture
+                onClick={togglePlay}
+                onError={(e) => console.error('Video Error', e)}
+            />
+            {/* Custom Play Button Overlay */}
+            {!isPlaying && (
+                <div
+                    className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all cursor-pointer"
+                    onClick={togglePlay}
+                >
+                    <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30 shadow-xl transition-transform hover:scale-110">
+                        <svg className="w-8 h-8 text-white fill-white ml-1" viewBox="0 0 24 24">
+                            <path d="M8 5v14l11-7z" />
+                        </svg>
+                    </div>
+                </div>
+            )}
+        </div>
     )
 }
