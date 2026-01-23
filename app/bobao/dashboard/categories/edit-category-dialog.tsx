@@ -51,7 +51,8 @@ export function EditCategoryDialog({ category }: { category: Category }) {
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="image">Nova Imagem (Opcional)</Label>
-                        <Input id="image" name="image" type="file" accept="image/*" />
+                        <Input id="image" name="image" type="file" accept="image/png, image/jpeg, image/webp" />
+                        <p className="text-[10px] text-zinc-500">Formatos aceitos: PNG, JPG ou WEBP.</p>
                         {category.imageUrl && (
                             <div className="mt-2">
                                 <p className="text-xs text-muted-foreground mb-1">Imagem Atual:</p>
